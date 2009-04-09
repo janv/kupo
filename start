@@ -1,0 +1,4 @@
+#!/bin/sh
+
+PATH=$PATH:./vendor/narwhal/bin
+./vendor/narwhal/bin/jackup framework/boot.js
