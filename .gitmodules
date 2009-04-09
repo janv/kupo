@@ -1,0 +1,6 @@
+[submodule "vendor/narwhal"]
+	path = vendor/narwhal
+	url = git://github.com/tlrobinson/narwhal.git
+[submodule "vendor/jack"]
+	path = vendor/jack
+	url = git://github.com/tlrobinson/jack.git
