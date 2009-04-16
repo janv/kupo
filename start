@@ -1,4 +1,5 @@
 #!/bin/sh
 
 PATH=$PATH:./vendor/narwhal/bin
+export KUPO_HOME=$(pwd)
 ./vendor/narwhal/bin/jackup framework/boot.js
