@@ -3,9 +3,9 @@ var Controller = exports.Controller = function(name){
 }
 
 //Identify the kind of the Controller to the Dispatcher
-controller.prototype.kind = "custom"
+Controller.prototype.kind = "custom"
 
 //Handle a request
-controller.prototype.handle = function(request) {
-  
+Controller.prototype.handle = function(request) {
+  return [200, {"Content-Type" : "text/plain"},  ["Hello World"]];
 }
