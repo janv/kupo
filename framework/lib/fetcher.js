@@ -5,20 +5,6 @@ var filename = function(name, type) {
   return $KUPO_HOME + '/app/' + type + "/" + name + ".js"
 }
 
-/* Return a factory function for the contents of a file */
-var evaluate = function (text, filename) {
-    if (typeof Packages !== "undefined" && Packages.java)
-        return Packages.org.mozilla.javascript.Context.getCurrentContext().compileFunction(
-            __global__,
-            "function(require,exports,environment){"+text+"}",
-            filename,
-            1,
-            null
-        );
-    else
-        return new Function("require", "exports", "environment", text);
-};
-
 /* Determine the Name of the variable containing the loaded object in the
  * exports hash of the factory
  * 
@@ -35,10 +21,7 @@ var varName = function(name, type) {
 /* Returns a Model or Controller  */
 var fetch = function(name, type) {
   var fname      = filename(name, type);
-  var content    = readFile(fname)
-  var filemodule = evaluate(content, fname)
-  var e = {}
-  filemodule(require, e, environment)
+  var e = require(fname)
   return e[varName(name, type)]
 }
 
