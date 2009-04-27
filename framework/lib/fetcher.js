@@ -1,5 +1,19 @@
 var Fetcher = exports.Fetcher = {}
 
+var FetchError = function(_name, _type){
+  this.name = _name;
+  this.type = _type
+}
+
+FetchError.prototype.message = function() {
+  if (this.type == 'controller')
+    return "Controller " + this.name + " was not found"
+  else if (this.type == 'model')
+    return "Model " + this.name + " was not found"
+  else
+    return this.name + " was not found"
+}
+
 /* Generate an absolute filename from the type and the name of a file to be loaded */
 var filename = function(name, type) {
   return $KUPO_HOME + '/app/' + type + "/" + name + ".js"
@@ -20,9 +34,13 @@ var varName = function(name, type) {
 
 /* Returns a Model or Controller  */
 var fetch = function(name, type) {
-  var fname      = filename(name, type);
-  var e = require(fname)
-  return e[varName(name, type)]
+  try {
+    var fname      = filename(name, type);
+    var e = require(fname)
+    return e[varName(name, type)]
+  } catch (error) {
+    throw new FetchError(name, type)
+  }
 }
 
 /* Return a controller by a given name */
@@ -34,4 +52,3 @@ Fetcher.fetchController = function(name) {
 Fetcher.fetchModel = function(name) {
   return fetch(name, 'model');  
 }
-

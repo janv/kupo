@@ -1,10 +1,7 @@
 TODO
 ==============================================================================
 
-- Jack/Narwhal Integration Branch benutzen
-
 - Dispatcher
-  - Fehlermeldungen für nicht gefundene Controller
   - Default-Controller / Index Controller
 
 - Wie geht der Lookup in Javascript?

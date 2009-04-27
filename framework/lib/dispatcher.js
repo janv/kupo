@@ -14,9 +14,13 @@ Dispatcher.handle = function(env) {
   var path = request.pathInfo().split('/');
   var controllerName = path[1]
   var actionName     = path[2]
-  var controller     = fetchController(controllerName)
-  //handle
-  return controller.handle(request)
+  try {
+    var controller = fetchController(controllerName)
+    //handle
+    return controller.handle(request)
+  } catch (error) {
+    return [500, {"Content-Type" : "text/plain"},  [error.message()]];
+  }
 }
 
 var fetchController = function(controllerName) {
