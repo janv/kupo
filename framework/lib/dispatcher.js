@@ -12,8 +12,8 @@ Dispatcher.handle = function(env) {
   var request = new Request(env);
   //resolve
   var path = request.pathInfo().split('/');
-  var controllerName = path[1]
-  var actionName     = path[2]
+  var controllerName = path[1] || 'default'
+  var actionName     = path[2] || 'index'
   try {
     var controller = fetchController(controllerName)
     //handle

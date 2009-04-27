@@ -1,9 +1,6 @@
 TODO
 ==============================================================================
 
-- Dispatcher
-  - Default-Controller / Index Controller
-
 - Wie geht der Lookup in Javascript?
   - In Good Parts nachschlagen
   - Wie kann ich Klassen implementieren
