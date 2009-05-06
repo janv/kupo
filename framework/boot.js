@@ -12,6 +12,16 @@ global.pp = function (x) {
   print(Util.serialize(x, true))
 }
 
+//Custom core extensions
+//Create objects descending from other objects
+if (typeof Object.create !== 'function') {
+  Object.create = function(o) {
+    var F = function(){};
+    F.prototype = o
+    return new F();
+  }  
+}
+
 //Require the Kupo Loader
 var Dispatcher = require('dispatcher').Dispatcher
 

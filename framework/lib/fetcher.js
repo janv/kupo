@@ -35,11 +35,23 @@ var varName = function(name, type) {
 /* Returns a Model or Controller  */
 var fetch = function(name, type) {
   try {
-    var fname      = filename(name, type);
+    var fname = filename(name, type);
     var e = require(fname)
     return e[varName(name, type)]
   } catch (error) {
     throw new FetchError(name, type)
+  }
+}
+
+var check = function(name, type) {
+  try {
+    var fname = filename(name, type);
+    var e = require(fname)
+    print("    " + e[varName(name,type)])
+    return e[varName(name, type)] != undefined
+  } catch (error) {
+    print("    " + error)
+    return false
   }
 }
 
@@ -51,4 +63,12 @@ Fetcher.fetchController = function(name) {
 /* Return a model by a given name */
 Fetcher.fetchModel = function(name) {
   return fetch(name, 'model');  
+}
+
+Fetcher.hasController = function(name) {
+  return check(name, 'controller')
+}
+
+Fetcher.hasModel = function(name) {
+  return check(name, 'model')
 }
