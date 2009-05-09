@@ -16,10 +16,10 @@ Dispatcher.handle = function(env) {
   var controllerName = path[1] || 'default'
   var actionName     = path[2] || 'index'
   if (hasController(controllerName)) {
-    var controller = fetchController(controllerName)
+    var controller = fetchController(controllerName).requestInstance()
   } else if (hasModel(controllerName)) {
     var model = fetchModel(controllerName)
-    var controller = new ResourceController(model)
+    var controller = ResourceController.requestInstance(model)
   } else {
     return [500, {"Content-Type" : "text/plain"},  ["No model or controller found for " + controllerName]];
   }

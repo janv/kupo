@@ -1,18 +1,40 @@
 var Controller = require('controller').Controller
 
-var CustomController = exports.CustomController = function(_name) {
-  this.name = _name
+var CustomController = exports.CustomController = Object.create(Controller)
+
+// Create a new concrete Controller by a given name
+CustomController.define = function(_name) {
+  var c = Object.create(CustomController)
+  c.name = _name;
+  return c
 }
 
-var CCP = CustomController.prototype = Object.create(Controller);
+// Return a clone of the Controller to handle a request
+//
+// Ensures that values stored in the Controller are cleared during the next request
+CustomController.requestInstance = function(){
+  return Object.create(this);
+}
 
 //Identify the kind of the Controller to the Dispatcher
-CCP.kind = "resource";
-//Handle a request
-CCP.handle = function(request) {
-  //calll object bauen (gemeinsam für Controller/ResourceController)
-    //gucken: GET?
-    //sonst aus JSON-dings bauen
-  //gucken: existiert die action?
-  return [200, {"Content-Type" : "text/plain"},  ["Hello World from custom controller"]];
+CustomController.kind = "custom";
+
+/*
+
+Methoden:
+
+/cont     immer zu index geroutet
+/cont/act GET-call mit parametern auf act
+/cont/act POST checken ob json-rpc oder gewöhnlicher post
+
+*/
+
+CustomController.process = function() {
+  var r = this.jrpcRequest()
+  if (typeof this[r.getMethodName()] == 'function') {
+    var result = this[r.getMethodName()].apply(this, r.getParameters())
+    return jrpcResponse(result);
+  } else {
+    return [500, {"Content-Type" : "text/plain"},  ["Method " + r.getMethodName() + " does not exist in controller " + this.name]];
+  }
 }
