@@ -62,3 +62,12 @@ JRPCRequest.prototype = {
     //maybe return JRPCResponse or just the targets return value
   }
 }
+
+JRPCRequest.buildResponse = function(status, stuff) {
+  var r = {};
+  for (x in stuff) {
+    r[x] = stuff[x];
+  }
+  r.version = "1.1"
+  return [status, {"Content-Type" : "text/plain"}, [JSON.stringify(r)]]
+}

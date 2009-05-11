@@ -1,5 +1,6 @@
 var Controller = require('controller').Controller
-var JSRPCRequest = require('controller').JSRPCRequest
+var JRPCRequest = require('controller').JRPCRequest
+var JSON = require('json')
 
 var ResourceController = exports.ResourceController = Object.create(Controller);
 
@@ -98,11 +99,11 @@ ResourceController.processJRPC = function(){
 }
 
 ResourceController.index = function(){
-  //build list and return as JSON response
-  return [200, {"Content-Type" : "text/plain"},  ["Hello World from resource controller." + this.model.name + " index"]];
+  var collection = this.model.all()
+  return JRPCRequest.buildResponse(200, {result  : collection })
 };
 
 ResourceController.show  = function(id){
-  //fetch single and return as JSON response
-  return [200, {"Content-Type" : "text/plain"},  ["Hello World from resource controller." + this.model.name + " show " + id]];
+  var item = this.model.find(id)
+  return JRPCRequest.buildResponse(200, {result  : item })
 };
