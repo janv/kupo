@@ -39,27 +39,48 @@ var Controller = exports.Controller = {
 
 
 var JRPCRequest = exports.JRPCRequest = function(request) {
-  if (request.requestMethod == 'GET') {
-    this.methodName = request.pathInfo().split('/')[2] || 'index'
-    //TODO: Parameter zuweisen
-  } else if (request.requestMethod == 'POST') {
-    //complicated stuff, JSON decode etc
-  }  
 }
+
+JRPCRequest.fromGET = function(methodName, request){
+  var r = new JRPCRequest(request);
+  r.methodName = methodName;
+  // TODO Bug im Simpleserver. Keine Arrays unterstützt
+  r.parameters = request.GET();
+  //TODO: Parameter in normalisierte form bringen (array wg. sortierung, bzw. ist es eigentlich schon)
+  return r;
+}
+
+JRPCRequest.fromPOST = function(request){
+  var r = new JRPCRequest(request);
+  var call = JSON.parse(request.body());
+  r.methodName = call.method;
+  r.parameters = call.params
+  //TODO: Zusehen dass Parameter in normalisierter Form sind
+  return r;
+}
+
 
 JRPCRequest.prototype = {
   getMethodName : function() {
     return this.methodName
   },
   getParameters : function() {
-    //return parameters as Array
+    var retval = []
+    for (var i=0; i < this.parameters.length; i++) {
+      retval.push(this.parameters[i][1]);
+    };
+    return retval;
   },
   getNamedParameters : function() {
-    //return parameters as Object
+    var retval = {}
+    for (var i=0; i < this.parameters.length; i++) {
+      retval[this.parameters[i][0]] = this.parameters[i][1];
+    };
+    return retval;
   },
   call : function(target) {
-    //call this method on a target
-    //maybe return JRPCResponse or just the targets return value
+    return target[this.methodName].apply(target, this.getParameters())
+    //maybe return JRPCResponse
   }
 }
 

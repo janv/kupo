@@ -51,35 +51,31 @@ ResourceController.process = function() {
   var urlparts = this.request.pathInfo().split('/')
   urlparts.shift();  //remove empty string
   urlparts.shift();  //remove model
-  var idOrAction = urlparts[0];
-  var jrpcGetAction  = urlparts[1];
-  if (method == 'GET') {
-    if (!idOrAction) {
-      //call index
-      return this.index();
-    } else if (idOrAction.match(/\d+/) ) {
-      if (jrpcGetAction) {
-        this.modelInstance = null; //TODO: replace by actual instance fetching
-        //GET-JRPC on instance
-      } else {
-        //call show
-        return this.show(idOrAction);
-      }
-    } else {
-      //GET-JRPC on model
-    }
-  } else if (method == 'POST') {
-    if (!idOrAction) {
-      // POST-JRPC on Class
-    } else if (idOrAction.match(/\d+/)) {
-      //POST-JRPC on Model
-    } else {
-      return [500, {"Content-Type" : "text/plain"},  ["Unsupported Request. POST requests have to target the model (/<model>) oder an indexed instance (/<model>/<int>)"]];
-    }
+
+  var id     = ((urlparts[0] || '').match(/^\d+$/) || [])[0]    
+  var proc   = id ? urlparts[1] : urlparts[0]        
+  
+  if        (method == 'GET'  && !id && !proc) {
+    return this.index();
+  } else if (method == 'GET'  &&  id && !proc) {
+    return this.show(id);
+  } else if (method == 'GET'  && !id &&  proc) {
+    // GET JRPC auf model
+    this.target = this.model;
+  } else if (method == 'GET'  &&  id &&  proc) {
+    // GET JRPC auf instanz
+    this.target = this.model.find(id);
+    var x = JRPCRequest.fromGET(proc, request)
+  } else if (method == 'POST' && !id) {
+    // POST JRPC on model
+    this.target = this.model;
+  } else if (method == 'POST' && id) {
+    // POST JRPC on instance
+    this.target = this.model.find(id);
   } else {
-    return [500, {"Content-Type" : "text/plain"},  ["Unsupported HTTP Method. Try GET or POST."]];
+    return [500, {"Content-Type" : "text/plain"},  ["Unsupported Request"]];
   }
-  //if we haven't returned yet, a JSON-RPC request was prepared. execute it!
+  this.processJRPC();
   return [200, {"Content-Type" : "text/plain"},  ["Hello World from resource controller. JSON-RPC would have been executed if JSON-RPC was implemented yet"]];
 };
 
