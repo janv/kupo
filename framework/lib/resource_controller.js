@@ -47,50 +47,50 @@ POST /model/<int>   -> JRPC auf Instanz
 */
 
 ResourceController.process = function() {
+  this.model.controllerCallback(this, 'beforeProcess')
+  
   var method   = this.request.requestMethod()
   var urlparts = this.request.pathInfo().split('/')
   urlparts.shift();  //remove empty string
   urlparts.shift();  //remove model
-
-  var id     = ((urlparts[0] || '').match(/^\d+$/) || [])[0]    
-  var proc   = id ? urlparts[1] : urlparts[0]        
+  var id     = ((urlparts[0] || '').match(/^\d+$/) || [])[0] // an instance id if we have one
+  var proc   = id ? urlparts[1] : urlparts[0] // the procedure to call (for GET-JRPC)
   
-  if        (method == 'GET'  && !id && !proc) {
+  if        (method == 'GET'  && !id && !proc) { // simple index action
     return this.index();
-  } else if (method == 'GET'  &&  id && !proc) {
+  } else if (method == 'GET'  &&  id && !proc) { // simple show/fetch action
     return this.show(id);
-  } else if (method == 'GET'  && !id &&  proc) {
-    // GET JRPC auf model
+  } else if (method == 'GET'  && !id &&  proc) { // GET JRPC on model
     this.target = this.model;
-  } else if (method == 'GET'  &&  id &&  proc) {
-    // GET JRPC auf instanz
+    var jrpcRequest = JRPCRequest.fromGET(proc, this.request)
+  } else if (method == 'GET'  &&  id &&  proc) { // GET JRPC on instance
     this.target = this.model.find(id);
-    var x = JRPCRequest.fromGET(proc, request)
-  } else if (method == 'POST' && !id) {
-    // POST JRPC on model
+    var jrpcRequest = JRPCRequest.fromGET(proc, this.request)
+  } else if (method == 'POST' && !id) { // POST JRPC on model
     this.target = this.model;
-  } else if (method == 'POST' && id) {
-    // POST JRPC on instance
+    var jrpcRequest = JRPCRequest.fromPOST(this.request)
+  } else if (method == 'POST' && id) { // POST JRPC on instance
     this.target = this.model.find(id);
+    var jrpcRequest = JRPCRequest.fromPOST(this.request)
   } else {
     return [500, {"Content-Type" : "text/plain"},  ["Unsupported Request"]];
   }
-  this.processJRPC();
+  return this.processJRPC(this.target, jrpcRequest);
   return [200, {"Content-Type" : "text/plain"},  ["Hello World from resource controller. JSON-RPC would have been executed if JSON-RPC was implemented yet"]];
 };
 
-ResourceController.processJRPC = function(){
-  var r = this.buildSimpleRequest(request) || this.jrpcRequest()
-  if (typeof this.model[r.getMethodName()] == 'function') {
-    if (this.model.rpcCallable(r.getMethodName())) {
-      //before_call_filters
-      var result = this.model[r.getMethodName()].apply(this.model, r.getParameters())
-      return jrpcResponse(result);
+ResourceController.processJRPC = function(target, jrpcRequest){
+  if (typeof target[jrpcRequest.getMethodName()] == 'function') {
+    if (this.model.rpcCallable(jrpcRequest.getMethodName())) {
+      var result = jrpcRequest.call(target)
+      this.model.controllerCallback(this, 'afterProcess')
+      //TODO Wenn models zurückgegeben werden, diese irgendwie auspacken, nur die Daten verschicken
+      return JRPCRequest.buildResponse(200, result);
     } else {
-      return [500, {"Content-Type" : "text/plain"},  ["Method " + r.getMethodName() + " is not callable remotely on " + this.model.name]];
+      return [500, {"Content-Type" : "text/plain"},  ["Method " + jrpcRequest.getMethodName() + " is not callable remotely on " + this.model.name]];
     }
   } else {
-    return [500, {"Content-Type" : "text/plain"},  ["Method " + r.getMethodName() + " does not exist in model " + this.model.name]];
+    return [500, {"Content-Type" : "text/plain"},  ["Method " + jrpcRequest.getMethodName() + " does not exist in model " + this.model.name]];
   }  
 }
 
