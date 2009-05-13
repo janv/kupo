@@ -13,4 +13,8 @@ var Project = Model.define('project',{
   }
 });
 
+Project.blubb = function() {
+  return "This is the miserable little result of the blubb-test function"
+}
+
 exports.Project = Project;
