@@ -46,7 +46,6 @@ JRPCRequest.fromGET = function(methodName, request){
   r.methodName = methodName;
   // TODO Bug im Simpleserver. Keine Arrays unterstützt
   r.parameters = request.GET();
-  //TODO: Parameter in normalisierte form bringen (array wg. sortierung, bzw. ist es eigentlich schon)
   return r;
 }
 
@@ -55,7 +54,6 @@ JRPCRequest.fromPOST = function(request){
   var call = JSON.parse(request.body());
   r.methodName = call.method;
   r.parameters = call.params
-  //TODO: Zusehen dass Parameter in normalisierter Form sind
   return r;
 }
 
@@ -66,17 +64,13 @@ JRPCRequest.prototype = {
   },
   getParameters : function() {
     var retval = []
-    for (var i=0; i < this.parameters.length; i++) {
-      retval.push(this.parameters[i][1]);
-    };
+    for(key in this.parameters) {
+      retval.push(this.parameters[key])
+    }
     return retval;
   },
   getNamedParameters : function() {
-    var retval = {}
-    for (var i=0; i < this.parameters.length; i++) {
-      retval[this.parameters[i][0]] = this.parameters[i][1];
-    };
-    return retval;
+    return this.parameters
   },
   call : function(target) {
     return target[this.methodName].apply(target, this.getParameters())
