@@ -14,15 +14,33 @@ var Controller = exports.Controller = {
     //create Reponse-Array for Jack from Value
   },
 
-  //Sessionstuff
-  // ...
+  cookiesLoad : function() {
+    //TODO implement
+  },
+  
+  cookiesStore : function() {
+    //TODO implement
+  },
 
+  //Sessionstuff
+  sessionSetup : function() {
+    //TODO implement
+  },
+  
+  sessionTeardown : function() {
+    //TODO implement
+  },
+  
   handle : function(_request) {
     //mit request und sessionkram und so initialisieren
     this.request = _request;
+    this.cookieLoad();
+    this.sessionSetup();
     //handler des erbenden controllers aufrufen
     var response = this.process();
     //dessen antwort noch ggf modifizieren, session usw. abbauen
+    this.sessionTeardown();
+    this.cookiesStore();
     this.request = null;
     //antwort zurückgeben
     return response;
