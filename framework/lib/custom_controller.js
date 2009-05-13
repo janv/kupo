@@ -30,10 +30,10 @@ CustomController.getAction = function(){
 
 Methoden:
 
-/cont     immer zu index geroutet
+/cont     GET immer zu index geroutet
+/cont     POST JSON-RPC
 /cont/act GET-call mit parametern auf act
-/cont/act POST checken ob json-rpc oder gewöhnlicher post
-
+/cont/act POST gewöhnlicher post
 */
 
 CustomController.process = function() {
