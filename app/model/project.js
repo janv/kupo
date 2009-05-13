@@ -13,8 +13,8 @@ var Project = Model.define('project',{
   }
 });
 
-Project.blubb = function() {
-  return "This is the miserable little result of the blubb-test function"
+Project.blubb = function(x) {
+  return "This is the result of the blubb test-function which multiplies the argument by 3: " + ( 3 * x ).toString()
 }
 
 exports.Project = Project;
