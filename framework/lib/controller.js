@@ -80,9 +80,7 @@ JRPCRequest.prototype = {
 
 JRPCRequest.buildResponse = function(status, stuff) {
   var r = {};
-  for (x in stuff) {
-    r[x] = stuff[x];
-  }
+  r.result = stuff
   r.version = "1.1"
   return [status, {"Content-Type" : "text/plain"}, [JSON.stringify(r)]]
 }
