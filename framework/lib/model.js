@@ -19,11 +19,14 @@ Model.rpcCallable = function(name) {
   return true;
 }
 
-Model.beforeCallFilters = function(controller, method, parameters){
-  // this.beforeCall.apply(controller)   // beforeCall als generic filter
-  // einen methodspezifischen filter
+Model.controllerCallback = function(controllerInstance, _callback){
+  if (this.specialization.callbacks
+      && this.specialization.callbacks[_callback]) {
+    this.specialization.callbacks[_callback].apply(controllerInstance)
+  }
 }
 
+// Persistence stuff
 Model.all = function(cond) {
   //fetch all by condition.
   return [];
@@ -36,3 +39,33 @@ var InstancePrototype = {}
 InstancePrototype.derive = function(spec){
   //spec ist die instanzspezifiaktion im model
 }
+
+
+
+
+/*
+
+Controllerfilter:
+
+beforeProcess
+afterProcess
+
+ModelFilter:
+
+beforeValidation 
+beforeValidation_on_create 
+beforeValidation_on_update 
+afterValidation 
+afterValidation_on_create 
+afterValidation_on_update 
+beforeSave 
+beforeCreate 
+beforeUpdate 
+afterCreate 
+afterUpdate 
+afterSave 
+beforeDestroy 
+afterDestroy 
+
+
+*/
