@@ -24,7 +24,7 @@ var Controller = exports.Controller = {
   handle : function(_request) {
     //mit request und sessionkram und so initialisieren
     this.request = _request;
-    this.cookieLoad();
+    this.cookiesLoad();
     this.sessionSetup();
     //handler des erbenden controllers aufrufen
     var response = this.process();
