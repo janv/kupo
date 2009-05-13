@@ -4,6 +4,9 @@ var JSON = require('json')
 
 var ResourceController = exports.ResourceController = Object.create(Controller);
 
+//Identify the kind of the Controller to the Dispatcher
+ResourceController.kind = "resource";
+
 ResourceController.requestInstance = function(_model){
   var r = Object.create(ResourceController);
   r.model = _model;
@@ -11,20 +14,7 @@ ResourceController.requestInstance = function(_model){
 }
 
 
-//Identify the kind of the Controller to the Dispatcher
-ResourceController.kind = "resource";
 
-// build the simple show and index request objects if conditions are met
-// else return null
-// ResourceController.buildSimpleRequest = function(request) {
-//   if (request.requestMethod() == 'GET') {
-//     //return something that behaves like a jrprcRequest and triggers the correct methods to be called
-//   } else {
-//     return null;
-//   };
-// }
-
-//Handle a request
 /*
 
 Methoden
@@ -46,6 +36,7 @@ POST /model/<int>   -> JRPC auf Instanz
 
 */
 
+//Handle a request
 ResourceController.process = function() {
   this.model.controllerCallback(this, 'beforeProcess')
   

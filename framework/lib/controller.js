@@ -1,19 +1,9 @@
 var JSON = require('json')
-//Controller gemeinsamkeiten hier rein:
-// JSON bauen
 
 var Controller = exports.Controller = {
   //Stores the Jack Request
   request : null,
   
-  jrpcRequest : function() {
-    // memoize/create JRPCrequest from this.request
-  },
-  
-  jrpcResponse : function(value){
-    //create Reponse-Array for Jack from Value
-  },
-
   cookiesLoad : function() {
     //TODO implement
   },
@@ -44,14 +34,6 @@ var Controller = exports.Controller = {
     this.request = null;
     //antwort zurückgeben
     return response;
-  },
-  
-  // process prepared request
-  //
-  // should be overwritten in custom_controller and resource_controller but not
-  // further down the inheritance chain
-  process : function() {
-    return [200, {"Content-Type" : "text/plain"},  ["Hello World from controller. This should have been overwritten"]];
   }
 }
 
