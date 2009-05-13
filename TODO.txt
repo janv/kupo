@@ -1,47 +1,23 @@
 TODO
 ==============================================================================
 
-- Wie geht der Lookup in Javascript?
-  - In Good Parts nachschlagen
-  - Wie kann ich Klassen implementieren
-    - FooController ist Instanz von Controller
-    - Für die behandlung eines einzigen Requests brauche ich eine Instanz des FooController
-      um darin die Session, den Request etc. speichern zu können
-
 - Controller
-  - Request Objekt vorbereiten mit
-    - Params
-    - Get/Post?
-  - Resource Controller
-    - Routing anhand der Models
-    - Implementierung des Resource Controllers
-    - Ansprechen von Model Classes /classname
-    - Ansprechen von Model Instances /classname/id
-  - JSON RPC
-    - In Controller einbauen
-    - Empfänger
-    - Antworten
-    - GET Unterstützung
-
-- Testing
-  - Framework raussuchen
-  - Gucken wie man den ganzen Quatsch im Shell-Mode betreiben kann
-  - Testing-Framework in Shellmode integrieren
-  - Tests schreiben
-
-- Splitting Clientside, Serverside Aspects
-  - Auslagern von Servercode nach Schema
-  - Zusammenführen von client-only und Servercode im fetcher
-  - Laden von Model-Code auf dem Client
-    - File Pass-Through über spezielle URL die im Dispatcher erkannt wird
+  - CustomController request abarbeitung
+    - POST /cont     JSON-RPC
+    - POST /cont/act gewöhnlicher post
+  - Cookies
+  - Sessions
+  - Exceptions im Custom- und ResourceController richtig behandeln
+  - Fehlermeldungen in JRPC richtig kommunizieren
+  - Dokumentation
 
 - Models
   - Klassenstruktur aufbauen
     - Class Prototype
     - Common Instance Prototype
   - Mongo Adapter bauen
-  - Client-Server Persistence
   - Persistenz in Models bauen
+  - Client-Server Persistence
   - Konstruktoren destruktoren etc.
     - Nested Structures
   - ...
@@ -55,9 +31,18 @@ TODO
     - Typen festlegen
     - Abarbeitung implementieren
   - RPC availability
-  - Resource Controller Callbacks
-    - Typen festlegen
-    - Abarbeitung implementieren
+
+- Testing
+  - Framework raussuchen
+  - Gucken wie man den ganzen Quatsch im Shell-Mode betreiben kann
+  - Testing-Framework in Shellmode integrieren
+  - Tests schreiben
+
+- Splitting Clientside, Serverside Aspects
+  - Auslagern von Servercode nach Schema
+  - Zusammenführen von client-only und Servercode im fetcher
+  - Laden von Model-Code auf dem Client
+    - File Pass-Through über spezielle URL die im Dispatcher erkannt wird
 
 - Clientside Libraries
   - Model Loader
