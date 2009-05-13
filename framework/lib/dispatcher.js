@@ -27,7 +27,7 @@ Dispatcher.handle = function(env) {
     //handle
     return controller.handle(request)
   } catch (error) {
-    return [500, {"Content-Type" : "text/plain"},  [error]];
+    return [500, {"Content-Type" : "text/plain"},  [error.toString(), error.fileName, error.lineNumber.toString()]];
   }
 }
 
