@@ -47,10 +47,10 @@ var check = function(name, type) {
   try {
     var fname = filename(name, type);
     var e = require(fname)
-    print("    " + e[varName(name,type)])
+    // print("    CHECK: " + e[varName(name,type)])
     return e[varName(name, type)] != undefined
   } catch (error) {
-    print("    " + error)
+    // print("    CHECK: ERROR " + error)
     return false
   }
 }

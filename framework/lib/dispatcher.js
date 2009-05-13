@@ -51,9 +51,9 @@ var hasController = function(controllerName) {
 }
 
 var hasModel = function(modelName) {
-  print("HasModel" + modelName)
-  print("  DispatcherDB.models[modelName] != undefined: " + (DispatcherDB.models[modelName] != undefined))
-  print("  Fetcher.hasModel(modelName): " + (Fetcher.hasModel(modelName)))
+  // print("HasModel" + modelName)
+  // print("  DispatcherDB.models[modelName] != undefined: " + (DispatcherDB.models[modelName] != undefined))
+  // print("  Fetcher.hasModel(modelName): " + (Fetcher.hasModel(modelName)))
   return (DispatcherDB.models[modelName] != undefined
         || Fetcher.hasModel(modelName))
 }
