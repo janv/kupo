@@ -1,4 +1,5 @@
 var Controller = require('controller').Controller
+var JRPCRequest = require('controller').JRPCRequest
 
 var CustomController = exports.CustomController = Object.create(Controller)
 
@@ -19,6 +20,12 @@ CustomController.requestInstance = function(){
 //Identify the kind of the Controller to the Dispatcher
 CustomController.kind = "custom";
 
+CustomController.getAction = function(){
+  var urlparts = this.request.pathInfo().split('/')
+  urlparts.shift();  //remove blank string
+  urlparts.shift();  //remove Controller
+  return urlparts[0] || 'index';
+}
 /*
 
 Methoden:
@@ -30,10 +37,10 @@ Methoden:
 */
 
 CustomController.process = function() {
-  var r = this.jrpcRequest()
+  var r = JRPCRequest.fromGET(this.getAction(), this.request);
   if (typeof this[r.getMethodName()] == 'function') {
-    var result = this[r.getMethodName()].apply(this, r.getParameters())
-    return jrpcResponse(result);
+    var result = r.call(this)
+    return JRPCRequest.buildResponse(200, result);
   } else {
     return [500, {"Content-Type" : "text/plain"},  ["Method " + r.getMethodName() + " does not exist in controller " + this.name]];
   }
