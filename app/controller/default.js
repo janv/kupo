@@ -3,7 +3,7 @@ var DefaultController = CustomController.define('default');
 
 DefaultController.actions = {
   index : function() {
-    return "Default Controller:index";
+    return [200, {"Content-Type" : "text/plain"}, ["Default Controller:index"]];
   }
 }
 

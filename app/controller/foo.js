@@ -4,11 +4,12 @@ FooController.xxx = "yyy";
 
 FooController.actions = {
   index : function() {
-    return "Hello from FooController.index"
+    return [200, {"Content-Type" : "text/plain"}, ["Hello from FooController.index"]];
   },
 
-  bar : function(x) {
-    return "Hello from FooController.bar: " + x
+  bar : function() {
+    x = this.request.GET('x')
+    return [200, {"Content-Type" : "text/plain"}, ["Hello from FooController.bar: " + x]];
   }
 }
 

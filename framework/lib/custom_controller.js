@@ -27,22 +27,12 @@ CustomController.getAction = function(){
   urlparts.shift();  //remove Controller
   return urlparts[0] || 'index';
 }
-/*
-
-Methoden:
-
-/cont     GET immer zu index geroutet
-/cont     POST JSON-RPC
-/cont/act GET-call mit parametern auf act
-/cont/act POST gewöhnlicher post
-*/
 
 CustomController.process = function() {
-  var r = JRPCRequest.fromGET(this.getAction(), this.request);
-  if (this.actions && this.actions[r.getMethodName()]) {
-    var result = this.actions[r.getMethodName()].apply(this, r.getParameters())
-    return JRPCRequest.buildResponse(200, result);
+  var method = this.request.requestMethod();
+  if (this.actions && this.actions[this.getAction()]) {
+    return this.actions[this.getAction()].apply(this)
   } else {
-    return [500, {"Content-Type" : "text/plain"},  ["Method " + r.getMethodName() + " does not exist in controller " + this.name]];
+    return [500, {"Content-Type" : "text/plain"},  ["Method " + this.getAction() + " does not exist in controller " + this.name]];
   }
 }
