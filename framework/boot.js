@@ -4,8 +4,6 @@ paths.push($KUPO_HOME + '/framework/lib')
 paths.push($KUPO_HOME + '/vendor/v8cgi')
 require.loader.setPaths(paths)
 
-var Jack = require("jack");
-
 //Prepare debug helpers
 var Util = require('util').Util
 global.pp = function (x) {
@@ -25,6 +23,11 @@ if (typeof Object.create !== 'function') {
 //Require the Kupo Loader
 var Dispatcher = require('dispatcher').Dispatcher
 
-var app = Dispatcher.handle
+exports.app = Dispatcher.handle
 
-exports.app = Jack.ContentLength(app)
+exports.development = function(app) {
+    return require("jack/commonlogger").CommonLogger(
+        require("jack/showexceptions").ShowExceptions(
+            require("jack/lint").Lint(
+                require("jack/contentlength").ContentLength(app))));
+}
