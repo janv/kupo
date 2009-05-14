@@ -3,37 +3,50 @@ var JSON = require('json')
 var Controller = exports.Controller = {
   //Stores the Jack Request
   request : null,
+  cookies : null,
+  session : null,
   
+  //Cookies
   cookiesLoad : function() {
-    //TODO implement
+    var crappyCookies = this.request.cookies();
+    this.cookies = {}
+    for (var key in crappyCookies) {
+      this.cookies[key.match(/^ *(.*)/)[1]] = crappy_cookies[key]
+    }
   },
   
   cookiesStore : function() {
-    //TODO implement
+    var pairs = []
+    for(var key in this.cookies) {
+      pairs.push(encodeURIComponent(key) + "=" + encodeURIComponent(this.cookies[key].toString())) 
+    }
+    this.response[1]["Set-Cookie"] = pairs.join(", ")
   },
 
   //Sessionstuff
   sessionSetup : function() {
-    //TODO implement
+    if (this.cookies['kupo_session']) {
+      this.session = JSON.decode(this.cookies['kupo_session']);
+    } else {
+      this.session = {}
+    }
   },
   
   sessionTeardown : function() {
-    //TODO implement
+    this.cookies['kupo_session'] = JSON.stringify(this.session);
   },
   
   handle : function(_request) {
-    //mit request und sessionkram und so initialisieren
     this.request = _request;
     this.cookiesLoad();
     this.sessionSetup();
     //handler des erbenden controllers aufrufen
-    var response = this.process();
-    //dessen antwort noch ggf modifizieren, session usw. abbauen
+    this.response = this.process();
     this.sessionTeardown();
     this.cookiesStore();
     this.request = null;
-    //antwort zurückgeben
-    return response;
+
+    return this.response;
   }
 }
 
