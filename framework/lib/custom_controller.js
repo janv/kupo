@@ -39,8 +39,8 @@ Methoden:
 
 CustomController.process = function() {
   var r = JRPCRequest.fromGET(this.getAction(), this.request);
-  if (typeof this[r.getMethodName()] == 'function') {
-    var result = r.call(this)
+  if (this.actions && this.actions[r.getMethodName()]) {
+    var result = this.actions[r.getMethodName()].apply(this, r.getParameters())
     return JRPCRequest.buildResponse(200, result);
   } else {
     return [500, {"Content-Type" : "text/plain"},  ["Method " + r.getMethodName() + " does not exist in controller " + this.name]];
