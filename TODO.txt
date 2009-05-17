@@ -2,11 +2,6 @@ TODO
 ==============================================================================
 
 - Controller
-  - CustomController request abarbeitung
-    - POST /cont     JSON-RPC
-    - POST /cont/act gewöhnlicher post
-  - Cookies
-  - Sessions
   - Exceptions im Custom- und ResourceController richtig behandeln
   - Fehlermeldungen in JRPC richtig kommunizieren
   - Dokumentation
