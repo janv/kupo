@@ -97,3 +97,10 @@ JRPCRequest.buildResponse = function(status, stuff) {
   r.version = "1.1"
   return [status, {"Content-Type" : "text/plain"}, [JSON.stringify(r)]]
 }
+
+JRPCRequest.buildError = function(status, error) {
+  var r = {};
+  r.error = error
+  r.version = "1.1"
+  return [status, {"Content-Type" : "text/plain"}, [JSON.stringify(r)]]
+}
