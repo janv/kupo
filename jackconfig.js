@@ -1,11 +1,9 @@
-global.$KUPO_HOME = system.env.KUPO_HOME
-var paths = require.loader.getPaths()
-paths.push($KUPO_HOME + '/framework/lib')
-paths.push($KUPO_HOME + '/vendor/v8cgi')
-require.loader.setPaths(paths)
+var Dir  = require("dir");
+    Kupo = require("./framework") //Would like to load the package in ./framework here
+global.$KUPO_HOME = Dir.pwd()
 
 //Prepare debug helpers
-var Util = require('util').Util
+var Util = require('./vendor/v8cgi/util').Util
 global.pp = function (x) {
   print(Util.serialize(x, true))
 }
