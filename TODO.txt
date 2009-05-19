@@ -2,8 +2,6 @@ TODO
 ==============================================================================
 
 - Controller
-  - Exceptions im Custom- und ResourceController richtig behandeln
-  - Fehlermeldungen in JRPC richtig kommunizieren
   - Dokumentation
 
 - Models

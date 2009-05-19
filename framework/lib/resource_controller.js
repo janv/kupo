@@ -1,6 +1,7 @@
 var Controller = require('controller').Controller
 var JRPCRequest = require('controller').JRPCRequest
 var JSON = require('json')
+var Errors = require('errors').Errors
 
 var ResourceController = exports.ResourceController = Object.create(Controller);
 
@@ -64,10 +65,9 @@ ResourceController.process = function() {
     this.target = this.model.find(id);
     var jrpcRequest = JRPCRequest.fromPOST(this.request)
   } else {
-    return [500, {"Content-Type" : "text/plain"},  ["Unsupported Request"]];
+    throw new Errors.NotImplementedError()
   }
   return this.processJRPC(this.target, jrpcRequest);
-  return [200, {"Content-Type" : "text/plain"},  ["Hello World from resource controller. JSON-RPC would have been executed if JSON-RPC was implemented yet"]];
 };
 
 ResourceController.processJRPC = function(target, jrpcRequest){
@@ -78,10 +78,10 @@ ResourceController.processJRPC = function(target, jrpcRequest){
       //TODO Wenn models zurückgegeben werden, diese irgendwie auspacken, nur die Daten verschicken
       return JRPCRequest.buildResponse(200, result);
     } else {
-      return [500, {"Content-Type" : "text/plain"},  ["Method " + jrpcRequest.getMethodName() + " is not callable remotely on " + this.model.name]];
+      throw new Errors.ForbiddenError("Method " + jrpcRequest.getMethodName() + " is not callable remotely on " + this.model.name)
     }
   } else {
-    return [500, {"Content-Type" : "text/plain"},  ["Method " + jrpcRequest.getMethodName() + " does not exist in model " + this.model.name]];
+    throw new Errors.NotFoundError("Method " + jrpcRequest.getMethodName() + " does not exist in model " + this.model.name)
   }  
 }
 

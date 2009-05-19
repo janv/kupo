@@ -1,4 +1,5 @@
-var JSON = require('json')
+var JSON   = require('json')
+var Errors = require('errors').Errors
 
 var Controller = exports.Controller = {
   //Stores the Jack Request
@@ -11,7 +12,7 @@ var Controller = exports.Controller = {
     var crappyCookies = this.request.cookies();
     this.cookies = {}
     for (var key in crappyCookies) {
-      this.cookies[key.match(/^ *(.*)/)[1]] = crappy_cookies[key]
+      this.cookies[key.match(/^ *(.*)/)[1]] = crappyCookies[key]
     }
   },
   
@@ -37,22 +38,25 @@ var Controller = exports.Controller = {
   },
   
   handle : function(_request) {
-    this.request = _request;
-    this.cookiesLoad();
-    this.sessionSetup();
-    //handler des erbenden controllers aufrufen
-    this.response = this.process();
-    this.sessionTeardown();
-    this.cookiesStore();
-    this.request = null;
-
-    return this.response;
+    try {
+      this.request = _request;
+      this.cookiesLoad();
+      this.sessionSetup();
+      //handler des erbenden controllers aufrufen
+      this.response = this.process();
+      this.sessionTeardown();
+      this.cookiesStore();
+      this.request = null;
+      return this.response;      
+    } catch (e) {
+      if (!e.isKupoError) { e = Errors.wrap(e); }
+      return e.to(this.request.contentType());
+    }
   }
 }
 
 
-var JRPCRequest = exports.JRPCRequest = function(request) {
-}
+var JRPCRequest = exports.JRPCRequest = function(request) {}
 
 JRPCRequest.fromGET = function(methodName, request){
   var r = new JRPCRequest(request);

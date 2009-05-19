@@ -1,5 +1,6 @@
 var Controller = require('controller').Controller
 var JRPCRequest = require('controller').JRPCRequest
+var Errors = require('errors').Errors
 
 var CustomController = exports.CustomController = Object.create(Controller)
 
@@ -33,6 +34,6 @@ CustomController.process = function() {
   if (this.actions && this.actions[this.getAction()]) {
     return this.actions[this.getAction()].apply(this)
   } else {
-    return [500, {"Content-Type" : "text/plain"},  ["Method " + this.getAction() + " does not exist in controller " + this.name]];
+    throw new Errors.NotFoundError("Method " + this.getAction() + " does not exist in controller " + this.name)
   }
 }
