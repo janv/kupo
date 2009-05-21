@@ -1,5 +1,12 @@
+var Errors = require('errors').Errors;
+var MongoAdapter = require('mongo_adapter').MongoAdapter
+
+//Connection
+var conn = MongoAdapter.getConnection();
+
 //Class prototype
 var Model = exports.Model = {}
+
 
 /*** define
     Use this in a model's definition file to define the model,
@@ -34,6 +41,9 @@ Model.define = function(_name, _specialization) {
   m.name = _name;
   m.specialization = _specialization;
   m.initSpecialization();
+  
+  var collection = Conn.getCollection(_name);
+  m.collection = function() {return collection;}
   return m;
 }
 
@@ -73,9 +83,20 @@ Model.controllerCallback = function(controllerInstance, _callback){
 }
 
 // Persistence stuff
-Model.all = function(cond) {
-  //fetch all by condition.
-  return [];
+/*** all
+    Pass a reference Object and returns a Mongo DBCursor
+*/
+Model.all = function(ref) {
+  return this.collection().find(ref) //TODO instancize Object
+}
+
+Model.find = function(ref) {
+  //TODO Instancize Object
+  if (typeof ref == 'number' || ref instanceof Number) {
+    return this.collection().findId(ref);
+  } else {
+    return this.collection().findOne(ref);
+  }
 }
 
 //Common instance prototype
