@@ -1,14 +1,24 @@
 TODO
 ==============================================================================
 
-- Controller
-  - Dokumentation
-
 - Models
+  - Mongo Adapter bauen
+    - getCollection
+    - store (coll.insert)
+    - load
+    - find(queryObject)
+    - count (collection.getCount)
+    - cursoroperationen
+    - forEach für Cursors
+    - index generation
+  - Mongo Anbindung
+    - Klasse.find
+    - Klasse.all
+    - Instance.store
+    - Instance.create
   - Klassenstruktur aufbauen
     - Class Prototype
     - Common Instance Prototype
-  - Mongo Adapter bauen
   - Persistenz in Models bauen
   - Client-Server Persistence
   - Konstruktoren destruktoren etc.
@@ -24,6 +34,9 @@ TODO
     - Typen festlegen
     - Abarbeitung implementieren
   - RPC availability
+
+- Controller
+  - Dokumentation
 
 - Testing
   - Framework raussuchen
