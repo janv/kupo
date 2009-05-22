@@ -87,7 +87,8 @@ Model.controllerCallback = function(controllerInstance, _callback){
     Pass a reference Object and returns a Mongo DBCursor
 */
 Model.all = function(ref) {
-  return this.collection().find(ref) //TODO instancize Object
+  ref = ref || {};
+  return this.collection().find(ref).toArray() //TODO instancize Object
 }
 
 Model.find = function(ref) {
