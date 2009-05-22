@@ -93,7 +93,7 @@ Collection.prototype = {
 }
 
 var Cursor = function(_mongoCursor) {
-  this.mongoCursor = _mongocursor;
+  this.mongoCursor = _mongoCursor;
 }
 Cursor.prototype = {
   hasNext : function() {
