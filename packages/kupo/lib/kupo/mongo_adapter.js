@@ -183,5 +183,5 @@ var convert =  function(obj) {
     Convert a MongoDB document to Javascript
 */
 var fromDoc = function(doc) {
-  return JSON.parse(doc.toString())
+  return JSON.parse(String(doc.toString()))
 }
