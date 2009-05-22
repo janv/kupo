@@ -42,7 +42,7 @@ Model.define = function(_name, _specialization) {
   m.specialization = _specialization;
   m.initSpecialization();
   
-  var collection = Conn.getCollection(_name);
+  var collection = conn.getCollection(_name);
   m.collection = function() {return collection;}
   return m;
 }
