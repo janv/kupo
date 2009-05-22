@@ -1,4 +1,4 @@
-var Model = require('model').Model;
+var Model = require('kupo/model').Model;
 var Project = Model.define('project',{
   instance: {
     

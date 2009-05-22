@@ -1,6 +1,6 @@
 var Request = require('jack/request').Request;
-var Fetcher = require('fetcher').Fetcher
-var ResourceController = require('resource_controller').ResourceController;
+var Fetcher = require('kupo/fetcher').Fetcher
+var ResourceController = require('kupo/resource_controller').ResourceController;
 
 var Dispatcher = exports.Dispatcher = {}
 

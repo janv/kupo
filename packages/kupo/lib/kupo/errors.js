@@ -1,4 +1,4 @@
-var JRPCRequest = require('controller').JRPCRequest
+var JRPCRequest = require('kupo/controller').JRPCRequest
 var JSON = require('json') 
 // var statuslist = {
 //   401 : "Unauthorized",          // Authorisierung fehlgeschlagen

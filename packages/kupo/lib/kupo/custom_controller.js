@@ -1,6 +1,6 @@
-var Controller = require('controller').Controller
-var JRPCRequest = require('controller').JRPCRequest
-var Errors = require('errors').Errors
+var Controller = require('kupo/controller').Controller
+var JRPCRequest = require('kupo/controller').JRPCRequest
+var Errors = require('kupo/errors').Errors
 
 var CustomController = exports.CustomController = Object.create(Controller)
 

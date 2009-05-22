@@ -1,4 +1,4 @@
-var CustomController = require('custom_controller').CustomController;
+var CustomController = require('kupo/custom_controller').CustomController;
 var FooController = CustomController.define('foo');
 FooController.xxx = "yyy";
 

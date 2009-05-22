@@ -1,4 +1,4 @@
-var Errors = require('errors').Errors;
+var Errors = require('kupo/errors').Errors;
 var JSON   = require('json')
 
 var Mongo         = Packages.com.mongodb.Mongo;

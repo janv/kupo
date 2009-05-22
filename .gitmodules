@@ -1,6 +1,6 @@
-[submodule "vendor/narwhal"]
-	path = vendor/narwhal
+[submodule "packages/narwhal"]
+	path = packages/narwhal
 	url = git://github.com/tlrobinson/narwhal.git
-[submodule "vendor/jack"]
-	path = vendor/jack
+[submodule "packages/jack"]
+	path = packages/jack
 	url = git://github.com/tlrobinson/jack.git
