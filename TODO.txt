@@ -3,17 +3,9 @@ TODO
 
 - Models
   - Mongo Adapter bauen
-    - getCollection
-    - store (coll.insert)
-    - load
-    - find(queryObject)
-    - count (collection.getCount)
     - cursoroperationen
     - forEach für Cursors
-    - index generation
   - Mongo Anbindung
-    - Klasse.find
-    - Klasse.all
     - Instance.store
     - Instance.create
   - Klassenstruktur aufbauen
