@@ -117,12 +117,11 @@ Cursor.prototype = {
   },
   
   toArray : function() {
-    var a = this.mongoCursor.toArray().toArray();
-    var b = [];
-    for (var i=0; i < a.length(); i++) {
-      b.push(fromDoc(a[i]))
-    };
-    return b;
+    var a = []
+    while(this.mongoCursor.hasNext()){
+      a.push(fromDoc(this.mongoCursor.next()));
+    }
+    return a;
   }
 }
 
