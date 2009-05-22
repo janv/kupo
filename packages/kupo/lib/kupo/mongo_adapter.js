@@ -45,19 +45,21 @@ Collection.prototype = {
   
   //returns iterator over DBObjects
   query : function(query, fields, toSkip, toReturn) {
-    // Nicht implementiert
     // abstract Iterator<DBObject> find( DBObject ref , DBObject fields , int numToSkip , int numToReturn ) throws MongoException ;
-    return this.mongoCollection.find(createDoc(query), createDoc(fields), toSkip, toReturn)
+    var it = this.mongoCollection.find(createDoc(query), createDoc(fields), toSkip, toReturn)
+    return new Cursor(it);
   },
   
-  //returns DBObject
+  //returns DBCursor
   find : function(ref) {
     if (ref === null) {
-      return this.mongoCollection.find();
+      var cursor = this.mongoCollection.find();
+      return new Cursor(cursor);
     } else {
-      return this.mongoCollection.find(createDoc(ref));
+      var cursor =  this.mongoCollection.find(createDoc(ref));
+      return new Cursor(cursor);
     }    
-  }
+  },
   
   ensureIndex  : function() {
     throw new Errors.InternalError("MongoCollection.ensureIndex isn't implemented yet");
@@ -86,10 +88,42 @@ Collection.prototype = {
     } else {
       return this.mongoCollection.getCount(createDoc(query));
     }
-  },
+  }
 }
 
-
+var Cursor = function(_mongoCursor) {
+  this.mongoCursor = _mongocursor;
+}
+Cursor.prototype = {
+  hasNext : function() {
+    return this.mongoCursor.hasNext();
+  },
+  
+  next    : function() {
+    return fromDoc(this.mongoCursor.next());
+  },
+  
+  curr    : function() {
+    return fromDoc(this.mongoCursor.curr());
+  },
+  
+  length  : function() {
+    return this.mongoCursor.length();
+  },
+  
+  count   : function() {
+    return this.mongoCursor.count();
+  },
+  
+  toArray : function() {
+    var a = this.mongoCursor.toArray().toArray();
+    var b = [];
+    for (var i=0; i < a.length(); i++) {
+      b.push(fromDoc(a[i]))
+    };
+    return b;
+  }
+}
 
 /*** createDoc
     Creates a BasicDBObject Document for the Mongo Java Adapter to store
