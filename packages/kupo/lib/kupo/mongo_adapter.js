@@ -9,20 +9,21 @@ var BasicDBList   = Packages.com.mongodb.BasicDBList;
 var MongoAdapter = exports.MongoAdapter = {};
 
 //Connection
-var Conn = new Mongo("kupo") //TODO: global konfigurieren und speichern
-MongoAdapter.getConnection = function(){
-  return Conn;
-}
-
-
 MongoAdapter.Connection = function(_database) {
   this.mongo = new Mongo(_database);
 }
 MongoAdapter.Connection.prototype = {
   getCollection : function(_collection) {
-    return new Collection(this.mongo.getCollection(_collection))
+    return new Collection(this.mongo.getCollection(_collection));
   }
 }
+
+var conn = new MongoAdapter.Connection("kupo") //TODO: global konfigurieren und speichern
+MongoAdapter.getConnection = function(){
+  return conn;
+}
+
+
 
 var Collection = function(_mongoCollection) {
   this.mongoCollection = _mongoCollection
