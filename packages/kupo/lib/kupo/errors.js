@@ -18,7 +18,7 @@ var Error = {
   },
   
   "toHTML" : function() {
-    var backtrace = String((this.inner.rhinoException && this.inner.rhinoException.printStackTrace()) || (this.inner.name + ": " + this.inner.message));
+    var backtrace = (this.inner && String( (this.inner.rhinoException && this.inner.rhinoException.printStackTrace()) || (this.inner.name + ": " + this.inner.message) )) || "";
     backtrace = "<pre>"+backtrace+"</pre>"
     return [this.code, {"Content-Type" : "text/html"}, ["<h1>Error " + this.code + "</h1> " + this.message + "<br>" + this.description + "<br>" + backtrace]]
   },
