@@ -1,5 +1,5 @@
-var Errors = require('errors').Errors;
-var MongoAdapter = require('mongo_adapter').MongoAdapter
+var Errors = require('kupo/errors').Errors;
+var MongoAdapter = require('kupo/mongo_adapter').MongoAdapter
 
 //Connection
 var conn = MongoAdapter.getConnection();

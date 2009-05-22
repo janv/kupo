@@ -1,0 +1,6 @@
+{
+    "name": "kupo",
+    "author": "Jan Varwig",
+    "js": "lib",
+    "jars": ["jars/mongo.jar"]
+}

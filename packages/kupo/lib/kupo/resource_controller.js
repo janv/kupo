@@ -1,7 +1,7 @@
-var Controller = require('controller').Controller
-var JRPCRequest = require('controller').JRPCRequest
+var Controller  = require('kupo/controller').Controller
+var JRPCRequest = require('kupo/controller').JRPCRequest
 var JSON = require('json')
-var Errors = require('errors').Errors
+var Errors = require('kupo/errors').Errors
 
 var ResourceController = exports.ResourceController = Object.create(Controller);
 

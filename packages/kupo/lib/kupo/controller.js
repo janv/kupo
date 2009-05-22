@@ -1,5 +1,5 @@
 var JSON   = require('json')
-var Errors = require('errors').Errors
+var Errors = require('kupo/errors').Errors
 
 var Controller = exports.Controller = {
   //Stores the Jack Request

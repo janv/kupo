@@ -1,6 +1,4 @@
 #!/bin/sh
 
-PATH=$PATH:./vendor/narwhal/bin
-export KUPO_HOME=$(pwd)
-export CLASSPATH=$KUPO_HOME/vendor/mongo.jar
-./vendor/narwhal/bin/jackup framework/boot.js
+PATH=$PATH:./packages/narwhal/bin
+narwhal .

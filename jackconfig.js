@@ -1,11 +1,7 @@
-global.$KUPO_HOME = system.env.KUPO_HOME
-var paths = require.loader.getPaths()
-paths.push($KUPO_HOME + '/framework/lib')
-paths.push($KUPO_HOME + '/vendor/v8cgi')
-require.loader.setPaths(paths)
+global.$KUPO_HOME = require("dir").pwd()
 
 //Prepare debug helpers
-var Util = require('util').Util
+var Util = require('./packages/v8cgi/util').Util
 global.pp = function (x) {
   print(Util.serialize(x, true))
 }
@@ -21,7 +17,7 @@ if (typeof Object.create !== 'function') {
 }
 
 //Require the Kupo Loader
-var Dispatcher = require('dispatcher').Dispatcher
+var Dispatcher = require('kupo/dispatcher').Dispatcher
 
 exports.app = Dispatcher.handle
 
