@@ -94,6 +94,8 @@ Model.find = function(ref) {
   //TODO Instancize Object
   if (typeof ref == 'number' || ref instanceof Number) {
     return this.collection().findId(ref);
+  } else if ((typeof ref == 'string' || ref instanceof String) && ref.match(/^\d$/)) {
+    return this.collection().findId(parseInt(ref));
   } else {
     return this.collection().findOne(ref);
   }
