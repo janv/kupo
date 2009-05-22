@@ -50,7 +50,7 @@ var check = function(name, type) {
     // print("    CHECK: " + e[varName(name,type)])
     return e[varName(name, type)] != undefined
   } catch (error) {
-    // print("    CHECK: ERROR " + error)
+    print("    CHECK: ERROR " + error)
     return false
   }
 }
