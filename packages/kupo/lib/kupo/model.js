@@ -4,9 +4,9 @@ var MongoAdapter = require('kupo/mongo_adapter').MongoAdapter
 //Connection
 var conn = MongoAdapter.getConnection();
 
-//Class prototype
-var Model = exports.Model = {}
+// Class prototype ///////////////////////////////////////////////////////////
 
+var Model = exports.Model = {}
 
 /*** define
     Use this in a model's definition file to define the model,
@@ -18,6 +18,10 @@ var Model = exports.Model = {}
       put callBack methods in here. Currently supported are
       - beforeProcess - Controller Callback
       - afterProcess  - Controller Callback
+      - beforeFind    - Controller Callback
+      - afterFind     - Controller Callback
+      - beforeAll     - Controller Callback
+      - afterAll      - Controller Callback
       Not yet supported are model lifecycle callbacks
       - beforeValidation 
       - beforeValidation_on_create 
@@ -39,7 +43,7 @@ var Model = exports.Model = {}
 Model.define = function(_name, _specialization) {
   var m = Object.create(Model);
   m.name = _name;
-  m.specialization = _specialization;
+  m.specialization = _specialization; //TODO Möglichst nicht speichern, alles über Closures
   m.initSpecialization();
   
   var collection = conn.getCollection(_name);
@@ -102,7 +106,8 @@ Model.find = function(ref) {
   }
 }
 
-//Common instance prototype
+// Common instance prototype /////////////////////////////////////////////////
+
 var InstancePrototype = {}
 
 //create an specialized instance prototype for a specific model
