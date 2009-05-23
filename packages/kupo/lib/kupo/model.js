@@ -6,7 +6,9 @@ var conn = MongoAdapter.getConnection();
 
 // Class prototype ///////////////////////////////////////////////////////////
 
-var Model = exports.Model = {}
+var Model = exports.Model = {
+  "defaultCallables" : ['all', 'find']
+}
 
 /*** define
     Use this in a model's definition file to define the model,
@@ -69,8 +71,15 @@ Model.initSpecialization = function(){
           specialization object
 */
 Model.rpcCallable = function(name) {
-  //return wether the named function is RPC-callable.
-  return true;
+  for (var i=0; i < this.defaultCallables.length; i++) {
+    if (this.defaultCallables[i] == name) return true;
+  };
+  if (this.specialization.callables && this.specialization.callables instanceof Array) {
+    for (var i=0; i < this.instance_spec.callables.length; i++) {
+      if (this.specialization.callables[i] == name) return true;
+    };
+  }
+  return false;
 }
 
 /*** controllerCallBack
@@ -108,13 +117,25 @@ Model.find = function(ref) {
 
 // Common instance prototype /////////////////////////////////////////////////
 
-var InstancePrototype = {}
+var InstancePrototype = {
+  "defaultCallables" : ['update']
+}
 
 //create an specialized instance prototype for a specific model
-InstancePrototype.derive = function(spec){
-  //spec ist die instanzspezifiaktion im model
+InstancePrototype.derive = function(_instance_spec){
+  var ip = Object.create(InstancePrototype);
+  ip.instance_spec = _instance_spec;
+  return ip;
 }
 
 InstancePrototype.rpcCallable = function(name) {
-  return true;
+  for (var i=0; i < this.defaultCallables.length; i++) {
+    if (this.defaultCallables[i] == name) return true;
+  };
+  if (this.instance_spec.callables && this.instance_spec.callables instanceof Array) {
+    for (var i=0; i < this.instance_spec.callables.length; i++) {
+      if (this.instance_spec.callables[i] == name) return true;
+    };
+  }
+  return false;
 }
