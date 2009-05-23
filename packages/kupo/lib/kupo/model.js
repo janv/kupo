@@ -7,7 +7,7 @@ var conn = MongoAdapter.getConnection();
 // Class prototype ///////////////////////////////////////////////////////////
 
 /** @class */
-var Model = exports.Model = {
+var ClassPrototype = exports.Model = {
   "defaultCallables" : ['all', 'find']
 }
 
@@ -45,8 +45,8 @@ var Model = exports.Model = {
  *   TODO: Store the model callbacks somewhere else
  * o DO NOT OVERWRITE
  */
-Model.define = function(_name, _specialization) {
-  var m = Object.create(Model);
+ClassPrototype.define = function(_name, _specialization) {
+  var m = Object.create(ClassPrototype);
   m.name = _name;
   m.specialization = _specialization; //TODO Möglichst nicht speichern, alles über Closures
   m.initSpecialization();
@@ -62,7 +62,7 @@ Model.define = function(_name, _specialization) {
  * 
  * @private
  */
-Model.initSpecialization = function(){
+ClassPrototype.initSpecialization = function(){
   // for (x in this.specialization)
   this.instancePrototype = InstancePrototype.derive(this.specialization.instance);
 }
@@ -74,7 +74,7 @@ Model.initSpecialization = function(){
  * in the instance part of the specialization or can be completely overwritten
  * to implement special behavior.
  */
-Model.rpcCallable = function(name) {
+ClassPrototype.rpcCallable = function(name) {
   for (var i=0; i < this.defaultCallables.length; i++) {
     if (this.defaultCallables[i] == name) return true;
   };
@@ -92,7 +92,7 @@ Model.rpcCallable = function(name) {
  *
  * @private
  */
-Model.controllerCallback = function(controllerInstance, _callback){
+ClassPrototype.controllerCallback = function(controllerInstance, _callback){
   if (this.specialization.callbacks
       && this.specialization.callbacks[_callback]) {
     this.specialization.callbacks[_callback].apply(controllerInstance)
@@ -102,13 +102,13 @@ Model.controllerCallback = function(controllerInstance, _callback){
 // Persistence stuff
 
 /** Pass a reference Object and returns a Mongo DBCursor */
-Model.all = function(ref) {
+ClassPrototype.all = function(ref) {
   ref = ref || {};
   return this.collection().find(ref).toArray() //TODO instancize Object
 }
 
 /** Pass a reference Object and returns the first found object */
-Model.find = function(ref) {
+ClassPrototype.find = function(ref) {
   //TODO Instancize Object
   if (typeof ref == 'number' || ref instanceof Number) {
     return this.collection().findId(ref);
@@ -134,7 +134,7 @@ var InstancePrototype = {
 /**
  * Create an specialized instance prototype for a specific model
  *
- * Called by Model.derive, passing the instance-part of the specialization
+ * Called by ClassPrototype.derive, passing the instance-part of the specialization
  * object. Do not call, do not overwrite.
  *
  * @private
