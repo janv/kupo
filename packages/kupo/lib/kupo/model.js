@@ -114,3 +114,7 @@ var InstancePrototype = {}
 InstancePrototype.derive = function(spec){
   //spec ist die instanzspezifiaktion im model
 }
+
+InstancePrototype.rpcCallable = function(name) {
+  return true;
+}
