@@ -64,7 +64,7 @@ ClassPrototype.define = function(_name, _specialization) {
  */
 ClassPrototype.initSpecialization = function(){
   // for (x in this.specialization)
-  this.instancePrototype = InstancePrototype.derive(this.specialization.instance, this);
+  this.instancePrototype = CommonInstancePrototype.derive(this.specialization.instance, this);
 }
 
 /**
@@ -135,7 +135,7 @@ ClassPrototype.makeNew = function(data) {
  *
  * @class
  */
-var InstancePrototype = {
+var CommonInstancePrototype = {
   "defaultCallables" : ['update'],
   "state" : 'new' // new, clean, dirty, deleted
 }
@@ -148,9 +148,9 @@ var InstancePrototype = {
  *
  * @private
  */
-InstancePrototype.derive = function(_instance_spec, _model){
-  var ip = Object.create(InstancePrototype);
-  ip.instance_spec = _instance_spec;
+CommonInstancePrototype.derive = function(_instanceSpec, _model){
+  var ip = Object.create(CommonInstancePrototype);
+  ip.instance_spec = _instanceSpec;
   ip.model = _model;
   return ip;
 }
@@ -162,7 +162,7 @@ InstancePrototype.derive = function(_instance_spec, _model){
  * in the instance part of the specialization or can be completely overwritten
  * to implement special behavior.
  */
-InstancePrototype.rpcCallable = function(name) {
+CommonInstancePrototype.rpcCallable = function(name) {
   for (var i=0; i < this.defaultCallables.length; i++) {
     if (this.defaultCallables[i] == name) return true;
   };
@@ -187,7 +187,7 @@ InstancePrototype.rpcCallable = function(name) {
  * @param {String} _state A flag describing the state of the object: new, clean, dirty, deleted
  *
  * @private
- * @member InstancePrototype
+ * @member CommonInstancePrototype
  */
 var newInstancePrototype = function(_instancePrototype, _data, _state) {
   var instance = Object.create(_instancePrototype);
