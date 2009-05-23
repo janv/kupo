@@ -206,6 +206,12 @@ CommonInstancePrototype.save = function() {
   }
 }
 
+CommonInstancePrototype.remove = function() {
+  var c = this.model.collection();
+  c.remove({'_id' : this.data['_id']});
+  this.state = 'deleted';
+}
+
 /**
  * Creates a model instance based on data object and a state flag.
  *
