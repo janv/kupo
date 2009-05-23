@@ -56,13 +56,13 @@ ResourceController.process = function() {
     this.target = this.model;
     var jrpcRequest = JRPCRequest.fromGET(proc, this.request)
   } else if (method == 'GET'  &&  id &&  proc) { // GET JRPC on instance
-    this.target = this.model.find(id);
+    this.target = this.object = this.model.find(id);
     var jrpcRequest = JRPCRequest.fromGET(proc, this.request)
   } else if (method == 'POST' && !id) { // POST JRPC on model
     this.target = this.model;
     var jrpcRequest = JRPCRequest.fromPOST(this.request)
   } else if (method == 'POST' && id) { // POST JRPC on instance
-    this.target = this.model.find(id);
+    this.target = this.object = this.model.find(id);
     var jrpcRequest = JRPCRequest.fromPOST(this.request)
   } else {
     throw new Errors.NotImplementedError()
