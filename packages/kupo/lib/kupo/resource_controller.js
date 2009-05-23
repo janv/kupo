@@ -86,12 +86,15 @@ ResourceController.processJRPC = function(target, jrpcRequest){
 }
 
 ResourceController.index = function(){
-  var collection = this.model.all()
-  return JRPCRequest.buildResponse(200, collection)
+  this.model.controllerCallback(this, 'beforeAll')
+  this.collection = this.model.all()
+  this.model.controllerCallback(this, 'afterAll')
+  return JRPCRequest.buildResponse(200, this.collection)
 };
 
 ResourceController.show  = function(id){
-  var item = this.model.find(id)
-  //TODO Wenn models zurückgegeben werden, diese irgendwie auspacken, nur die Daten verschicken
-  return JRPCRequest.buildResponse(200, item )
+  this.model.controllerCallback(this, 'beforeFind')
+  this.object = this.model.find(id)
+  this.model.controllerCallback(this, 'afterFind')
+  return JRPCRequest.buildResponse(200, this.object ) //TODO Wenn models zurückgegeben werden, diese irgendwie auspacken, nur die Daten verschicken
 };
