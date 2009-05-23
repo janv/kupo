@@ -123,7 +123,7 @@ ClassPrototype.find = function(ref) {
 /** Create a new Instance with initial data */
 ClassPrototype.makeNew = function(data) {
   data = data || {};
-  delete(data['id']);
+  delete(data['_id']);
   return newInstancePrototype(this.instancePrototype, data, 'new');
 }
 
