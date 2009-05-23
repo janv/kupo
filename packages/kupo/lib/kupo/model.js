@@ -127,6 +127,13 @@ ClassPrototype.makeNew = function(data) {
   return newInstancePrototype(this.instancePrototype, data, 'new');
 }
 
+/** Create a new Instance with initial data and save it */
+ClassPrototype.create = function(data) {
+  var i = this.makeNew(data);
+  i.save();
+  return i;
+}
+
 // Common instance prototype /////////////////////////////////////////////////
 
 /**
