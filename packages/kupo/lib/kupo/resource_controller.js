@@ -73,10 +73,10 @@ ResourceController.process = function() {
 ResourceController.processJRPC = function(target, jrpcRequest){
   if (typeof target[jrpcRequest.getMethodName()] == 'function') {
     if (this.model.rpcCallable(jrpcRequest.getMethodName())) {
-      var result = jrpcRequest.call(target)
+      this.result = jrpcRequest.call(target)
       this.model.controllerCallback(this, 'afterProcess')
       //TODO Wenn models zurückgegeben werden, diese irgendwie auspacken, nur die Daten verschicken
-      return JRPCRequest.buildResponse(200, result);
+      return JRPCRequest.buildResponse(200, this.result);
     } else {
       throw new Errors.ForbiddenError("Method " + jrpcRequest.getMethodName() + " is not callable remotely on " + this.model.name)
     }
