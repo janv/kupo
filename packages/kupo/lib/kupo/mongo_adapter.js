@@ -30,10 +30,15 @@ var Collection = function(_mongoCollection) {
 }
 Collection.prototype = {
   insert : function(o) {
-    if (!(o instanceof Array)) o = [o]
-    for (var i=0; i < o.length; i++) {
-      this.mongoCollection.insert(createDoc(o[i]))
-    };
+    if (o instanceof Array){
+      var r = [];
+      for (var i=0; i < o.length; i++) {
+        r.push(fromDoc(this.mongoCollection.insert(createDoc(o[i]))));
+      };
+      return r;
+    } else {
+      return fromDoc(this.mongoCollection.insert(createDoc(o)));
+    }
   },
   
   update : function(finder, object, upsert, apply) {
