@@ -175,6 +175,31 @@ CommonInstancePrototype.rpcCallable = function(name) {
 }
 
 /**
+ * Save this object to the database
+ *
+ * @return true if the object was saved, false if it wasn't
+ */
+CommonInstancePrototype.save = function() {
+  var c = this.model.collection();
+  switch (this.state) {
+    case 'new':
+      delete(this.data['_id']);
+      this.data = c.insert(this.data);
+      this.state = 'clean'
+      return true;
+    case 'dirty':
+      this.data = c.update({'_id': this.data.id}, this.data, true, true);
+      this.state = 'clean'
+      return true;
+    case 'clean':
+      return false;
+    case 'deleted':
+      return false;
+      break;
+  }
+}
+
+/**
  * Creates a model instance based on data object and a state flag.
  *
  * This is NOT supposed to be called by the user, it's only used internally to
