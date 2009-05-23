@@ -104,19 +104,27 @@ ClassPrototype.controllerCallback = function(controllerInstance, _callback){
 /** Pass a reference Object and returns a Mongo DBCursor */
 ClassPrototype.all = function(ref) {
   ref = ref || {};
-  return this.collection().find(ref).toArray() //TODO instancize Object
+  return this.collection().find(ref).map(function(o){
+    return newInstancePrototype(this.instancePrototype, o, 'clean');
+  })
 }
 
 /** Pass a reference Object and returns the first found object */
 ClassPrototype.find = function(ref) {
-  //TODO Instancize Object
   if (typeof ref == 'number' || ref instanceof Number) {
-    return this.collection().findId(ref);
+    return newInstancePrototype(this.instancePrototype, this.collection().findId(ref), 'clean');
   } else if ((typeof ref == 'string' || ref instanceof String) && ref.match(/^\d$/)) {
-    return this.collection().findId(parseInt(ref));
+    return newInstancePrototype(this.instancePrototype, this.collection().findId(parseInt(ref)), 'clean');
   } else {
-    return this.collection().findOne(ref);
+    return newInstancePrototype(this.instancePrototype, this.collection().findOne(ref), 'clean');
   }
+}
+
+/** Create a new Instance with initial data */
+ClassPrototype.makeNew = function(data) {
+  data = data || {};
+  delete(data['id']);
+  return newInstancePrototype(this.instancePrototype, data, 'new');
 }
 
 // Common instance prototype /////////////////////////////////////////////////
@@ -128,7 +136,8 @@ ClassPrototype.find = function(ref) {
  * @class
  */
 var InstancePrototype = {
-  "defaultCallables" : ['update']
+  "defaultCallables" : ['update'],
+  "state" : 'new' // new, clean, dirty, deleted
 }
 
 /**
@@ -163,4 +172,27 @@ InstancePrototype.rpcCallable = function(name) {
     };
   }
   return false;
+}
+
+/**
+ * Creates a model instance based on data object and a state flag.
+ *
+ * This is NOT supposed to be called by the user, it's only used internally to
+ * manufacture instances. Do not call or override this method.
+ *
+ * (This is not an accessible Method on the InstancePrototype to prevent manual calls to it)
+ *
+ * @param {InstancePrototype} _instancePrototype The Instance Prototype the instance should be derived from.
+ * @param {Object} _data The data describing the objects properties, from the database
+ * @param {String} _state A flag describing the state of the object: new, clean, dirty, deleted
+ *
+ * @private
+ * @member InstancePrototype
+ */
+var newInstancePrototype = function(_instancePrototype, _data, _state) {
+  var instance = Object.create(_instancePrototype);
+  instance.data  = _data  || {};
+  //TODO: New nur ohne id
+  instance.state = _state || 'new';
+  return instance;
 }
