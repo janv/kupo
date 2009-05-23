@@ -122,6 +122,17 @@ Cursor.prototype = {
       a.push(fromDoc(this.mongoCursor.next()));
     }
     return a;
+  },
+  
+  /**
+   * Takes a function, and maps the elements of this Cursor to an array with it.
+   */
+  map : function(mapFun){
+    var a = []
+    while(this.mongoCursor.hasNext()){
+      a.push(mapFun(fromDoc(this.mongoCursor.next())));
+    }
+    return a;    
   }
 }
 
