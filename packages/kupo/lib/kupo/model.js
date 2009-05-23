@@ -64,7 +64,7 @@ ClassPrototype.define = function(_name, _specialization) {
  */
 ClassPrototype.initSpecialization = function(){
   // for (x in this.specialization)
-  this.instancePrototype = InstancePrototype.derive(this.specialization.instance);
+  this.instancePrototype = InstancePrototype.derive(this.specialization.instance, this);
 }
 
 /**
@@ -139,9 +139,10 @@ var InstancePrototype = {
  *
  * @private
  */
-InstancePrototype.derive = function(_instance_spec){
+InstancePrototype.derive = function(_instance_spec, _model){
   var ip = Object.create(InstancePrototype);
   ip.instance_spec = _instance_spec;
+  ip.model = _model;
   return ip;
 }
 
