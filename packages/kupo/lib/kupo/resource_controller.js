@@ -86,6 +86,7 @@ ResourceController.processJRPC = function(target, jrpcRequest){
 }
 
 ResourceController.index = function(){
+  if (!this.model.rpcCallable('all')) throw new Errors.ForbiddenError("Method all is not callable remotely on " + this.model.name)
   this.model.controllerCallback(this, 'beforeAll')
   this.collection = this.model.all()
   this.model.controllerCallback(this, 'afterAll')
@@ -93,6 +94,7 @@ ResourceController.index = function(){
 };
 
 ResourceController.show  = function(id){
+  if (!this.model.rpcCallable('find')) throw new Errors.ForbiddenError("Method find is not callable remotely on " + this.model.name)
   this.model.controllerCallback(this, 'beforeFind')
   this.object = this.model.find(id)
   this.model.controllerCallback(this, 'afterFind')
