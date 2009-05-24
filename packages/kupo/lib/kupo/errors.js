@@ -8,7 +8,13 @@ var JSON = require('json')
 //   500 : "Not Implemented"        //
 // }
 
+/**
+ * Base class for all the Errors defined in this file
+ *
+ * @private
+ */
 var Error = {
+  /** Turn this error into a JRPC response that can be handled by hack */
   "toJRPC" : function() {
     return JRPCRequest.buildError(this.code, {
       code: this.code,
@@ -17,12 +23,17 @@ var Error = {
     })
   },
   
+  /** Turn this error into a HTML response that can be handled by hack */
   "toHTML" : function() {
     var backtrace = (this.inner && String( (this.inner.rhinoException && this.inner.rhinoException.printStackTrace()) || (this.inner.name + ": " + this.inner.message) )) || "";
     backtrace = "<pre>"+backtrace+"</pre>"
     return [this.code, {"Content-Type" : "text/html"}, ["<h1>Error " + this.code + "</h1> " + this.message + "<br>" + this.description + "<br>" + backtrace]]
   },
   
+  /**
+   * Turn this error into a response matching the provided content-type.
+   * Calls either toJSON or toHTML.
+   */
   "to" : function(contentType) {
     if (typeof contentType == 'string' && contentType.match(/json/i)) {
       return this.toJRPC();
@@ -31,6 +42,11 @@ var Error = {
     }
   },
   
+  /**
+   * Initialize the details of the error
+   * 
+   * @private
+   */
   initDetails : function (_details) {
     this.description = (_details || {})['description'] || "";
     this.inner = (_details || {})['inner'];
@@ -41,9 +57,11 @@ var Error = {
     }
   },
   
+  /** Used to recognize this as a Kupo Error */
   isKupoError : true
 }
 
+/** A list of all supported Errors */
 var Errors = exports.Errors = {}
 
 Errors.UnauthorizedError = function(_message, _details) {
@@ -86,6 +104,7 @@ Errors.NotImplementedError = function(_message, _details) {
 }
 Errors.NotImplementedError.prototype = Error;
 
+/** Wraps any exception into an InternalError */ 
 Errors.wrap = function(e) {
   return new Errors.InternalError(null, {inner: e});
 }

@@ -3,41 +3,50 @@ var JRPCRequest = require('kupo/controller').JRPCRequest
 var JSON = require('json')
 var Errors = require('kupo/errors').Errors
 
+/**
+ * Base class for custom controllers
+ * @class
+ */
 var ResourceController = exports.ResourceController = Object.create(Controller);
 
-//Identify the kind of the Controller to the Dispatcher
+/** Identify the kind of the Controller to the Dispatcher */
 ResourceController.kind = "resource";
 
+/**
+ * Return a clone of the Controller to handle a request
+ * Ensures that values stored in the Controller are cleared during the next request
+ *
+ * @param {Model} _model The model this instance should operate on
+ */
 ResourceController.requestInstance = function(_model){
   var r = Object.create(ResourceController);
   r.model = _model;
   return r;
 }
 
-
-
-/*
-
-Methoden
-
-GET  /model         -> Simple: Collection
-                          index aufrufen
-GET  /model/<int>   -> Simple: Single resource
-                          show aufrufen
-GET  /model/*       -> GET JRPC auf Model
-                          JRPC aus request bauen (letztes segment + querystring)
-GET  /model/<int>/* -> GET JRPC auf Instanz
-                          Instanz laden
-                          JRPC aus request bauen (letztes segment + querystring)
-POST /model         -> JRPC auf Klasse
-                          JRPC aus Body bauen
-POST /model/<int>   -> JRPC auf Instanz
-                          Instanz laden
-                          JRPC aus body bauen
-
-*/
-
-//Handle a request
+/**
+ * Process the request.
+ * Called in Controller.handle, do not call by yourself
+ *
+ * Methods
+ * 
+ * GET  /model         -> Simple: Collection
+ *                           call index
+ * GET  /model/<int>   -> Simple: Single resource
+ *                           call show
+ * GET  /model/*       -> GET JRPC on Model
+ *                           build JRPC from request (last segment + querystring)
+ * GET  /model/<int>/* -> GET JRPC auf Instanz
+ *                           load instance
+ *                           build JRPC from request (last segment + querystring)
+ * POST /model         -> JRPC auf Klasse
+ *                           build JRPC from body
+ * POST /model/<int>   -> JRPC auf Instanz
+ *                           load instance
+ *                           build JRPC from body
+ * 
+ * @private
+ */
 ResourceController.process = function() {
   this.model.controllerCallback(this, 'beforeProcess')
   
@@ -70,6 +79,14 @@ ResourceController.process = function() {
   return this.processJRPC(this.target, jrpcRequest);
 };
 
+/**
+ * Process the request as a JRPCrequest
+ * Called in process(), do not call by yourself
+ * 
+ * @param target The object on which to call the requested method
+ * @param {JRPCRequest} jrpcRequest The JRPCRequest object to execute
+ * @private
+ */
 ResourceController.processJRPC = function(target, jrpcRequest){
   if (typeof target[jrpcRequest.getMethodName()] == 'function') {
     if (this.model.rpcCallable(jrpcRequest.getMethodName())) {
@@ -85,6 +102,12 @@ ResourceController.processJRPC = function(target, jrpcRequest){
   }  
 }
 
+/**
+ * The index action for retrieving a collection of instances of this model.
+ * Called in process(), do not call by yourself
+ * 
+ * @private
+ */
 ResourceController.index = function(){
   if (!this.model.rpcCallable('all')) throw new Errors.ForbiddenError("Method all is not callable remotely on " + this.model.name)
   this.model.controllerCallback(this, 'beforeAll')
@@ -93,6 +116,12 @@ ResourceController.index = function(){
   return JRPCRequest.buildResponse(200, this.collection)
 };
 
+/**
+ * The show action for retrieving a single instances of this model.
+ * Called in process(), do not call by yourself
+ * 
+ * @private
+ */
 ResourceController.show  = function(id){
   if (!this.model.rpcCallable('find')) throw new Errors.ForbiddenError("Method find is not callable remotely on " + this.model.name)
   this.model.controllerCallback(this, 'beforeFind')

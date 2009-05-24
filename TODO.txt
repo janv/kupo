@@ -2,45 +2,33 @@ TODO
 ==============================================================================
 
 - Models
-  - Mongo Adapter bauen
-    - cursoroperationen
-    - forEach für Cursors
-  - Mongo Anbindung
-    - Instance.store
-    - Instance.create
-  - Klassenstruktur aufbauen
-    - Class Prototype
-    - Common Instance Prototype
-  - Persistenz in Models bauen
-  - Client-Server Persistence
-  - Konstruktoren destruktoren etc.
-    - Nested Structures
-  - ...
+  - Client-server persistence
+  - Support nested structures
   - Associations
   - Validations
-    - Definitionen
-    - Überprüfung
-    - Error-Objekt
-    - Einbindung in ResourceController
-  - Callbacks
-    - Typen festlegen
-    - Abarbeitung implementieren
-  - RPC availability
-
-- Controller
-  - Dokumentation
+    - Definitions
+    - Execution
+    - Error-objects
+    - Implementation in ResourceController
+  - Implement model callbacks
+   - Execution
+   - Exceptions
 
 - Testing
-  - Framework raussuchen
-  - Gucken wie man den ganzen Quatsch im Shell-Mode betreiben kann
-  - Testing-Framework in Shellmode integrieren
-  - Tests schreiben
+  - Write small framework
+  - See if Jack can operate in a simulated mode
+  - See how to run everything in shellmode
+  - Write tests
+
+- Static Asset delivery
+  - In Dispatcher check for
+    - availability of files
+    - requests for models
+  - Deliver correspondingly using X-Sendfile
 
 - Splitting Clientside, Serverside Aspects
-  - Auslagern von Servercode nach Schema
-  - Zusammenführen von client-only und Servercode im fetcher
-  - Laden von Model-Code auf dem Client
-    - File Pass-Through über spezielle URL die im Dispatcher erkannt wird
+  - Develop and implement method for outsourcing serverside-only code
+  - Join client and server-only code in fetcher
 
 - Clientside Libraries
   - Model Loader

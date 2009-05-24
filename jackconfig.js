@@ -1,13 +1,16 @@
+/** A global reference to the Kupo home directory */
 global.$KUPO_HOME = require("dir").pwd()
 
-//Prepare debug helpers
+// Prepare debug helpers
 var Util = require('./packages/v8cgi/util').Util
+/** Console Pretty printer */
 global.pp = function (x) {
   print(Util.serialize(x, true))
 }
 
-//Custom core extensions
-//Create objects descending from other objects
+// Custom core extensions
+
+/** Create objects descending from other objects */
 if (typeof Object.create !== 'function') {
   Object.create = function(o) {
     var F = function(){};
