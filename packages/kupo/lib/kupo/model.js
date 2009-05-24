@@ -224,6 +224,38 @@ CommonInstancePrototype.remove = function() {
 }
 
 /**
+ * Set properties of this instance and save it.
+ *
+ * @see set
+ */
+CommonInstancePrototype.update = function(propData, value) {
+  this.set(propData, value);
+  this.save();
+}
+
+/**
+ * Set properties of this instance. Either provide name and value or just an
+ * object containing names an values of properties you want to update.
+ */
+CommonInstancePrototype.set = function(propData, value) {
+  if (typeof propData == "string" || propData instanceof String) {
+    this.data[propData] = value;
+  } else {
+    for (var p in propData) {
+      this.data[p] = propData[p];
+    }
+  }
+  this.state = 'dirty';
+}
+
+/**
+ * Access a property of this instance by name.
+ */
+CommonInstancePrototype.get = function(property) {
+  return this.data[property];
+}
+
+/**
  * Creates a model instance based on data object and a state flag.
  *
  * This is NOT supposed to be called by the user, it's only used internally to
