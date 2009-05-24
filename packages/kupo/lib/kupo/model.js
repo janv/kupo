@@ -213,6 +213,17 @@ CommonInstancePrototype.remove = function() {
 }
 
 /**
+ * Remove this instance from the database
+ *
+ * @see set
+ */
+CommonInstancePrototype.remove = function() {
+  var c = this.model.collection();
+  c.remove({'_id' : this.data['_id']});
+  this.state = 'deleted';
+}
+
+/**
  * Creates a model instance based on data object and a state flag.
  *
  * This is NOT supposed to be called by the user, it's only used internally to
