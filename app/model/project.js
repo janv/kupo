@@ -3,6 +3,7 @@ var Project = Model.define('project',{
   instance: {
     
   },
+  callables: ['blubb'],
   callbacks: {
     beforeProcess: function(){
       print('PROJECT beforeProcess callback executing')
