@@ -1,6 +1,6 @@
 [submodule "packages/narwhal"]
 	path = packages/narwhal
-	url = git://github.com/tlrobinson/narwhal.git
+	url = git://github.com/janv/narwhal.git
 [submodule "packages/jack"]
 	path = packages/jack
-	url = git://github.com/tlrobinson/jack.git
+	url = git://github.com/janv/jack.git
