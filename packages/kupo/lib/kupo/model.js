@@ -79,7 +79,7 @@ ClassPrototype.rpcCallable = function(name) {
     if (this.defaultCallables[i] == name) return true;
   };
   if (this.specialization.callables && this.specialization.callables instanceof Array) {
-    for (var i=0; i < this.instance_spec.callables.length; i++) {
+    for (var i=0; i < this.specialization.callables.length; i++) {
       if (this.specialization.callables[i] == name) return true;
     };
   }
