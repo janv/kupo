@@ -2,12 +2,13 @@ var Controller  = require('kupo/controller').Controller
 var JRPCRequest = require('kupo/controller').JRPCRequest
 var JSON = require('json')
 var Errors = require('kupo/errors').Errors
+var Support = require('kupo/support').Support;
 
 /**
  * Base class for custom controllers
  * @class
  */
-var ResourceController = exports.ResourceController = Object.create(Controller);
+var ResourceController = exports.ResourceController = Support.clone(Controller);
 
 /** Identify the kind of the Controller to the Dispatcher */
 ResourceController.kind = "resource";
@@ -19,7 +20,7 @@ ResourceController.kind = "resource";
  * @param {Model} _model The model this instance should operate on
  */
 ResourceController.requestInstance = function(_model){
-  var r = Object.create(ResourceController);
+  var r = Support.clone(ResourceController);
   r.model = _model;
   return r;
 }

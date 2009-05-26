@@ -1,12 +1,13 @@
 var Controller = require('kupo/controller').Controller
 var JRPCRequest = require('kupo/controller').JRPCRequest
 var Errors = require('kupo/errors').Errors
+var Support = require('kupo/support').Support;
 
 /**
  * Base class for custom controllers
  * @class
  */
-var CustomController = exports.CustomController = Object.create(Controller)
+var CustomController = exports.CustomController = Support.clone(Controller)
 
 /** Identify the kind of the Controller to the Dispatcher */
 CustomController.kind = "custom";
@@ -19,7 +20,7 @@ CustomController.kind = "custom";
  * @constructor
  */
 CustomController.define = function(_name) {
-  var c = Object.create(CustomController)
+  var c = Support.clone(CustomController)
   c.name = _name;
   return c
 }
@@ -29,7 +30,7 @@ CustomController.define = function(_name) {
  * Ensures that values stored in the Controller are cleared during the next request
  */
 CustomController.requestInstance = function(){
-  return Object.create(this);
+  return Support.clone(this);
 }
 
 /**

@@ -1,5 +1,6 @@
 var Errors = require('kupo/errors').Errors;
 var MongoAdapter = require('kupo/mongo_adapter').MongoAdapter
+var Support = require('kupo/support').Support;
 
 //Connection
 var conn = MongoAdapter.getConnection();
@@ -46,7 +47,7 @@ var ClassPrototype = exports.Model = {
  * o DO NOT OVERWRITE
  */
 ClassPrototype.define = function(_name, _specialization) {
-  var m = Object.create(ClassPrototype);
+  var m = Support.clone(ClassPrototype);
   m.name = _name;
   m.specialization = _specialization; //TODO Möglichst nicht speichern, alles über Closures
   m.initSpecialization();
@@ -156,7 +157,7 @@ var CommonInstancePrototype = {
  * @private
  */
 CommonInstancePrototype.derive = function(_instanceSpec, _model){
-  var ip = Object.create(CommonInstancePrototype);
+  var ip = Support.clone(CommonInstancePrototype);
   ip.instance_spec = _instanceSpec;
   ip.model = _model;
   return ip;
@@ -271,7 +272,7 @@ CommonInstancePrototype.get = function(property) {
  * @member CommonInstancePrototype
  */
 var newInstancePrototype = function(_instancePrototype, _data, _state) {
-  var instance = Object.create(_instancePrototype);
+  var instance = Support.clone(_instancePrototype);
   instance.data  = _data  || {};
   //TODO: New nur ohne id
   instance.state = _state || 'new';
