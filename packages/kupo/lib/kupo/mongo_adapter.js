@@ -56,6 +56,7 @@ Collection.prototype = {
    * @return The object (or an array of objects) extended by the Mongo properties _id and _ns
    */
   insert : function(o) {
+    if (arguments.length > 1) o = Array.prototype.slice.call(arguments);
     if (o instanceof Array){
       var r = [];
       for (var i=0; i < o.length; i++) {
