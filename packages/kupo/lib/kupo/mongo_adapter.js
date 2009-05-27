@@ -25,13 +25,23 @@ MongoAdapter.Connection.prototype = {
 }
 
 // To be returned by getConnection in a closure
+var name = "kupo"
 var conn = null;
 
 /** Return the global database connection */
 MongoAdapter.getConnection = function(){
-  conn = conn || new MongoAdapter.Connection("kupo"); //TODO: global konfigurieren und speichern
+  conn = conn || new MongoAdapter.Connection(name); //TODO: global konfigurieren und speichern
   return conn;
 }
+
+/**
+ * Re-initialize the global database connection with a new database name
+ */
+MongoAdapter.setConnection = function(_name){
+  name = _name;
+  conn = null;
+}
+
 
 /**
  * A Wrapper around a MongoDB Collection
