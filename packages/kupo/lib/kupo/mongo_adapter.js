@@ -41,6 +41,14 @@ var Collection = function(_mongoCollection) {
 }
 
 Collection.prototype = {
+  
+  /**
+   * Drop the collection from the Database
+   */
+  drop : function() {
+    this.mongoCollection.drop();
+  },
+  
   /**
    * Insert an object into the collection
    * Inserts either a single object or an array
