@@ -7,6 +7,7 @@ global.pp = function (x) {
   print(Util.serialize(x, true))
 }
 
-exports.testModel = require("./mongo_adapter-tests");
+exports.testMongoAdapter = require("./mongo_adapter-tests");
+exports.testModel = require("./model-tests");
 
 require("os").exit(require("test/runner").run(exports));
