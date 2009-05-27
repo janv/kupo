@@ -85,23 +85,7 @@ Collection.prototype = {
    * @param {Object} finder A finder object used to find the record to be updated
    */
   remove : function(finder) {
-    this.mongoCollection.remove(createDoc(finder))
-  },
-  
-  /**
-   * Perform a database query
-   *
-   * @param {Object} query Query used to search
-   * @param {Object} fields The fields of matching objects to return
-   * @param {Number} toSkip will not return the first <tt>toSkip</tt> matches
-   * @param {Number} toReturn limit the results to this number
-   *
-   * @return Cursor over the results
-   */
-  query : function(query, fields, toSkip, toReturn) {
-    // abstract Iterator<DBObject> find( DBObject ref , DBObject fields , int numToSkip , int numToReturn ) throws MongoException ;
-    var it = this.mongoCollection.find(createDoc(query), createDoc(fields), toSkip, toReturn)
-    return new Cursor(it);
+    this.mongoCollection.remove(createDoc(finder));
   },
   
   /**
