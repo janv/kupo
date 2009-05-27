@@ -95,24 +95,13 @@ Collection.prototype = {
    * @return Cursor over the results
    */
   find : function(ref) {
-    if (ref === null) {
+    if (ref == null) {
       var cursor = this.mongoCollection.find();
-      return new Cursor(cursor);
     } else {
       var cursor =  this.mongoCollection.find(createDoc(ref));
-      return new Cursor(cursor);
     }    
+    return new Cursor(cursor);
   },
-  
-  ensureIndex  : function() {
-    throw new Errors.InternalError("MongoCollection.ensureIndex isn't implemented yet");
-    // public abstract void ensureIndex( DBObject keys , String name , boolean unique ) throws MongoException ;
-    // public abstract void ensureIndex( DBObject keys , String name ) throws MongoException ;
-    // public final void ensureIndex( final DBObject keys )
-    // public final void ensureIndex( final DBObject keys , final boolean force )
-    // public final void ensureIndex( final DBObject keys , final boolean force , final boolean unique )
-  },
-  
   
   /**
    * Perform a simple database query for a single record
