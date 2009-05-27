@@ -257,7 +257,11 @@ var convert =  function(obj) {
       } else if (obj instanceof Object) {
           var o = new BasicDBObject();
           for (var p in obj) {
-            o.put(p, arguments.callee(obj[p]));
+            if (p == "_id") {
+              o.put(p, new Packages.com.mongodb.ObjectId(obj[p]));
+            } else {
+              o.put(p, arguments.callee(obj[p]));
+            }
           }
           return o;
       }
