@@ -148,7 +148,7 @@ Collection.prototype = {
    * @return The amount of records matching ref
    */
   count : function(ref) {
-    if (ref === null) {
+    if (ref == null) {
       return this.mongoCollection.getCount();
     } else {
       return this.mongoCollection.getCount(createDoc(ref));
@@ -221,7 +221,7 @@ var createDoc = function(obj) {
   if (typeof obj == 'object' && obj instanceof Object) {
     return convert(obj);
   } else {
-	  throw new Errors.InternalError("Only objects can be be serialized into BSON objects");
+	  throw new Errors.InternalError("Only objects can be be serialized into BSON objects, you tried " + JSON.stringify(obj));
   }
 }
 
@@ -286,5 +286,5 @@ var convert =  function(obj) {
  * @private
  */
 var fromDoc = function(doc) {
-  return JSON.parse(String(doc.toString()))
+  return JSON.parse(String(doc.toString())); //TODO too simple
 }
