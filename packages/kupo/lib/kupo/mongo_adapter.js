@@ -77,7 +77,9 @@ Collection.prototype = {
    * @param {boolean} apply  A flag indicating wether the object should be equipped with _id if it is inserted
    */
   update : function(finder, object, upsert, apply) {
-    this.mongoCollection.update(createDoc(finder), createDoc(object), upsert, apply)
+    if (upsert === undefined) upsert = true;
+    if (apply === null || apply === undefined) apply = true;
+    return fromDoc(this.mongoCollection.update(createDoc(finder), createDoc(object), upsert, apply));
   },
   
   /**
