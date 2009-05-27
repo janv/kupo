@@ -19,14 +19,18 @@ var Error = {
     return JRPCRequest.buildError(this.code, {
       code: this.code,
       message: this.message,
-      description: this.description
+      description: this.description,
+      backtrace : this.backtrace()
     })
+  },
+  
+  "backtrace" : function(){
+    return (this.inner && String( (this.inner.rhinoException && this.inner.rhinoException.printStackTrace()) || (this.inner.name + ": " + this.inner.message) )) || "";
   },
   
   /** Turn this error into a HTML response that can be handled by hack */
   "toHTML" : function() {
-    var backtrace = (this.inner && String( (this.inner.rhinoException && this.inner.rhinoException.printStackTrace()) || (this.inner.name + ": " + this.inner.message) )) || "";
-    backtrace = "<pre>"+backtrace+"</pre>"
+    backtrace = "<pre>"+this.backtrace()+"</pre>";
     return [this.code, {"Content-Type" : "text/html"}, ["<h1>Error " + this.code + "</h1> " + this.message + "<br>" + this.description + "<br>" + backtrace]]
   },
   
@@ -40,6 +44,10 @@ var Error = {
     } else {
       return this.toHTML();
     }
+  },
+  
+  "toString" : function() {
+    return this.name + ": " + this.message + this.backtrace();
   },
   
   /**
