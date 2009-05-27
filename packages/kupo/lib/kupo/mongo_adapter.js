@@ -112,7 +112,12 @@ Collection.prototype = {
    * @return The resulting object
    */
   findOne : function(ref) {
-    return fromDoc(this.mongoCollection.findOne(createDoc(ref)))
+    var r = this.mongoCollection.findOne(createDoc(ref))
+    if (r == null) {
+      return null;
+    } else {
+      return fromDoc(r);
+    }
   },
 
   /**
