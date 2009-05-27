@@ -158,7 +158,7 @@ var CommonInstancePrototype = {
  */
 CommonInstancePrototype.derive = function(_instanceSpec, _model){
   var ip = Support.clone(CommonInstancePrototype);
-  ip.instance_spec = _instanceSpec;
+  ip.instanceSpec = _instanceSpec; //TODO CamelCase
   ip.model = _model;
   return ip;
 }
@@ -174,9 +174,9 @@ CommonInstancePrototype.rpcCallable = function(name) {
   for (var i=0; i < this.defaultCallables.length; i++) {
     if (this.defaultCallables[i] == name) return true;
   };
-  if (this.instance_spec.callables && this.instance_spec.callables instanceof Array) {
-    for (var i=0; i < this.instance_spec.callables.length; i++) {
-      if (this.instance_spec.callables[i] == name) return true;
+  if (this.instanceSpec.callables && this.instanceSpec.callables instanceof Array) {
+    for (var i=0; i < this.instanceSpec.callables.length; i++) {
+      if (this.instanceSpec.callables[i] == name) return true;
     };
   }
   return false;
