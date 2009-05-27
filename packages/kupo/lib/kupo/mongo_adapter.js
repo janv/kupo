@@ -25,10 +25,11 @@ MongoAdapter.Connection.prototype = {
 }
 
 // To be returned by getConnection in a closure
-var conn = new MongoAdapter.Connection("kupo") //TODO: global konfigurieren und speichern
+var conn = null;
 
 /** Return the global database connection */
 MongoAdapter.getConnection = function(){
+  conn = conn || new MongoAdapter.Connection("kupo"); //TODO: global konfigurieren und speichern
   return conn;
 }
 
