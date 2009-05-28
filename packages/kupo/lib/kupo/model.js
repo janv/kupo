@@ -112,10 +112,8 @@ ClassPrototype.all = function(ref) {
 
 /** Pass a reference Object and returns the first found object */
 ClassPrototype.find = function(ref) {
-  if (typeof ref == 'number' || ref instanceof Number) {
+  if (ref.toString().match(/^[abcdef\d]+$/)) {
     return newInstancePrototype(this.instancePrototype, this.collection().findId(ref), 'clean');
-  } else if ((typeof ref == 'string' || ref instanceof String) && ref.match(/^\d$/)) {
-    return newInstancePrototype(this.instancePrototype, this.collection().findId(parseInt(ref)), 'clean');
   } else {
     return newInstancePrototype(this.instancePrototype, this.collection().findOne(ref), 'clean');
   }
@@ -145,7 +143,7 @@ ClassPrototype.create = function(data) {
  */
 var CommonInstancePrototype = {
   "defaultCallables" : ['update'],
-  "state" : 'new' // new, clean, dirty, deleted
+  "state" : 'new' // new, clean, dirty, removed
 }
 
 /**
@@ -196,32 +194,23 @@ CommonInstancePrototype.save = function() {
       this.state = 'clean'
       return true;
     case 'dirty':
-      this.data = c.update({'_id': this.data.id}, this.data, true, true);
+      this.data = c.update({'_id': this.data._id}, this.data, true, true);
       this.state = 'clean'
       return true;
     case 'clean':
       return false;
-    case 'deleted':
+    case 'removed':
       return false;
       break;
   }
 }
 
 CommonInstancePrototype.remove = function() {
-  var c = this.model.collection();
-  c.remove({'_id' : this.data['_id']});
-  this.state = 'deleted';
-}
-
-/**
- * Remove this instance from the database
- *
- * @see set
- */
-CommonInstancePrototype.remove = function() {
-  var c = this.model.collection();
-  c.remove({'_id' : this.data['_id']});
-  this.state = 'deleted';
+  if (this.state != 'new') {
+    var c = this.model.collection();
+    c.remove({'_id' : this.data['_id']});
+  }
+  this.state = 'removed';
 }
 
 /**
@@ -238,15 +227,24 @@ CommonInstancePrototype.update = function(propData, value) {
  * Set properties of this instance. Either provide name and value or just an
  * object containing names an values of properties you want to update.
  */
-CommonInstancePrototype.set = function(propData, value) {
-  if (typeof propData == "string" || propData instanceof String) {
-    this.data[propData] = value;
+CommonInstancePrototype.set = function(prop, value) {
+  if (typeof prop == "string" || prop instanceof String) {
+    if (prop != '_id' && prop != "_ns") this.data[prop] = value;
   } else {
-    for (var p in propData) {
-      this.data[p] = propData[p];
+    var newData = prop, overwrite = value;
+    delete(newData['_id']);
+    delete(newData['_ns']);
+    if (overwrite == true){
+      newData._id = this.data._id;
+      newData._ns = this.data._ns;
+      this.data = newData;
+    } else {
+      for (var p in newData) {
+        this.data[p] = newData[p];
+      }      
     }
   }
-  this.state = 'dirty';
+  if (this.state == 'clean') this.state = 'dirty';
 }
 
 /**
@@ -254,6 +252,14 @@ CommonInstancePrototype.set = function(propData, value) {
  */
 CommonInstancePrototype.get = function(property) {
   return this.data[property];
+}
+
+/**
+ * Erase a property of this instance.
+ */
+CommonInstancePrototype.erase = function(property) {
+  delete(this.data[property]);
+  this.state = 'dirty';
 }
 
 /**
