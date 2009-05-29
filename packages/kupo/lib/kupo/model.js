@@ -106,16 +106,16 @@ ClassPrototype.callBack = function(context, _callback){
 ClassPrototype.all = function(ref) {
   ref = ref || {};
   return this.collection().find(ref).map(function(o){
-    return newInstancePrototype(this.instancePrototype, o, 'clean');
+    return newInstance(this.instancePrototype, o, 'clean');
   })
 }
 
 /** Pass a reference Object and returns the first found object */
 ClassPrototype.find = function(ref) {
   if (ref.toString().match(/^[abcdef\d]+$/)) {
-    return newInstancePrototype(this.instancePrototype, this.collection().findId(ref), 'clean');
+    return newInstance(this.instancePrototype, this.collection().findId(ref), 'clean');
   } else {
-    return newInstancePrototype(this.instancePrototype, this.collection().findOne(ref), 'clean');
+    return newInstance(this.instancePrototype, this.collection().findOne(ref), 'clean');
   }
 }
 
@@ -123,7 +123,7 @@ ClassPrototype.find = function(ref) {
 ClassPrototype.makeNew = function(data) {
   data = data || {};
   delete(data['_id']);
-  return newInstancePrototype(this.instancePrototype, data, 'new');
+  return newInstance(this.instancePrototype, data, 'new');
 }
 
 /** Create a new Instance with initial data and save it */
@@ -327,7 +327,7 @@ CommonInstancePrototype.validate = function() {
  * @private
  * @member CommonInstancePrototype
  */
-var newInstancePrototype = function(_instancePrototype, _data, _state) {
+var newInstance = function(_instancePrototype, _data, _state) {
   var instance = Support.clone(_instancePrototype);
   instance.data  = _data  || {};
   //TODO: New nur ohne id
