@@ -252,32 +252,34 @@ exports.testCallbacks = {
     this.callbacks = {}
     this.Foo = Model.define('foo',{
       callbacks : this.callbacks
-    })
+    });
+    this.Foo.collection().drop();
   },
 
-  testBeforeValidation : function() {
-    //TODO Implement validation
-  },
-
-  testBeforeValidation_on_create : function() {
-    //TODO Implement validation
-  },
-
-  testBeforeValidation_on_update : function() {
-    //TODO Implement validation
-  },
-
-  testAfterValidation : function() {
-    //TODO Implement validation
-  },
-
-  testAfterValidation_on_create : function() {
-    //TODO Implement validation
-  },
-
-  testAfterValidation_on_update : function() {
-    //TODO Implement validation
-  },
+  // Not Tested, Boring
+  // testBeforeValidation : function() {
+  //   //TODO Implement validation
+  // },
+  // 
+  // testBeforeValidationOnCreate : function() {
+  //   //TODO Implement validation
+  // },
+  // 
+  // testBeforeValidationOnUpdate : function() {
+  //   //TODO Implement validation
+  // },
+  // 
+  // testAfterValidation : function() {
+  //   //TODO Implement validation
+  // },
+  // 
+  // testAfterValidationOnCreate : function() {
+  //   //TODO Implement validation
+  // },
+  // 
+  // testAfterValidationOnUpdate : function() {
+  //   //TODO Implement validation
+  // },
 
   testBeforeSave : function() {
     this.callbacks['beforeSave'] = function() {
@@ -363,4 +365,48 @@ exports.testCallbacks = {
     assert.isTrue(flag);
   },
 
+}
+
+exports.testValidations = {
+  setup : function() {
+    this.validations = [];
+    this.Foo = Model.define('foo',{
+      validations : this.validations
+    });
+    this.Foo.collection().drop();
+    this.foop = this.Foo.makeNew({a:1});
+  },
+
+  testExecute : function() {
+    this.validations.push(function(){
+      this.xxx = 123
+    });
+    this.foop.save()
+    assert.isEqual(123, this.foop.xxx);
+  },
+  
+  testPreventSaving : function() {
+    this.validations.push(function(){
+      this.errors.push("Something wrong");
+    });
+    this.foop.set('b', 2);
+    assert.isTrue(!this.foop.save());
+    assert.isEqual('new', this.foop.state);
+    assert.isEqual("Something wrong", this.foop.errors[0]);
+  },
+  
+  testInOrder : function() {
+    var order = [];
+    this.validations.push(function(){
+      order.push(1);
+    });
+    this.validations.push(function(){
+      order.push(2);
+    });
+    this.foop.validate();
+    assert.isEqual(1, order[0]);
+    assert.isEqual(2, order[1]);
+  },
+  
+  testErrors : function() {}
 }

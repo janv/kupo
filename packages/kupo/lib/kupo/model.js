@@ -30,11 +30,11 @@ var ClassPrototype = exports.Model = {
  *   - afterAll      - Controller Callback
  *   Not yet supported are model lifecycle callbacks
  *   - beforeValidation
- *   - beforeValidation_on_create
- *   - beforeValidation_on_update
+ *   - beforeValidationOnCreate
+ *   - beforeValidationOnUpdate
  *   - afterValidation
- *   - afterValidation_on_create
- *   - afterValidation_on_update
+ *   - afterValidationOnCreate
+ *   - afterValidationOnUpdate
  *   - beforeSave
  *   - beforeCreate
  *   - beforeUpdate
@@ -190,21 +190,41 @@ CommonInstancePrototype.save = function() {
   switch (this.state) {
     case 'new':
       delete(this.data['_id']);
-      this.model.callBack(this, 'beforeCreate');
-      this.model.callBack(this, 'beforeSave');
-      this.data = c.insert(this.data);
-      this.state = 'clean'
-      this.model.callBack(this, 'afterSave');
-      this.model.callBack(this, 'afterCreate');
-      return true;
+      this.model.callBack(this, 'beforeValidation');
+      this.model.callBack(this, 'beforeValidationOnCreate');
+      var valid = this.validate();
+      this.model.callBack(this, 'afterValidation');
+      this.model.callBack(this, 'afterValidationOnCreate');
+
+      if (valid) {
+        this.model.callBack(this, 'beforeSave');
+        this.model.callBack(this, 'beforeCreate');
+        this.data = c.insert(this.data);
+        this.state = 'clean'
+        this.model.callBack(this, 'afterCreate');
+        this.model.callBack(this, 'afterSave');
+        return true;
+      } else {
+        return false;
+      }
     case 'dirty':
-      this.model.callBack(this, 'beforeUpdate');
-      this.model.callBack(this, 'beforeSave');
-      this.data = c.update({'_id': this.data._id}, this.data, true, true);
-      this.state = 'clean'
-      this.model.callBack(this, 'afterSave');
-      this.model.callBack(this, 'afterUpdate');
-      return true;
+      this.model.callBack(this, 'beforeValidation');
+      this.model.callBack(this, 'beforeValidationOnUpdate');
+      var valid = this.validate();
+      this.model.callBack(this, 'afterValidation');
+      this.model.callBack(this, 'afterValidationOnUpdate');
+
+      if (valid) {
+        this.model.callBack(this, 'beforeSave');
+        this.model.callBack(this, 'beforeUpdate');
+        this.data = c.update({'_id': this.data._id}, this.data, true, true);
+        this.state = 'clean'
+        this.model.callBack(this, 'afterUpdate');
+        this.model.callBack(this, 'afterSave');
+        return true;
+      } else {
+        return false;
+      }
     case 'clean':
       return false;
     case 'removed':
@@ -269,6 +289,30 @@ CommonInstancePrototype.erase = function(property) {
 }
 
 /**
+ * Validates this instance based on the validation functions in
+ * the 'validations' property of the model's specializaition.
+ * Provide an array with functions there which are executed in this instance's context
+ * in their present order.
+ *
+ * Inside a validation function, push to this.errors to make the validation fail.
+ * Push a string to give an error message for the entire object, or push an array
+ * containing a data property and the error message for this property to explain why
+ * exactly the validation failed.
+ *
+ * @returns True or False, indicating if any of the executed validations added anything to the errors object.
+ */
+CommonInstancePrototype.validate = function() {
+  this.errors = [];
+  var s = this.model.specialization;
+  if (s.validations instanceof Array) {
+    for (var i=0; i < s.validations.length; i++) {
+      s.validations[i].apply(this)
+    };
+  }
+  return (this.errors.length < 1);
+}
+
+/**
  * Creates a model instance based on data object and a state flag.
  *
  * This is NOT supposed to be called by the user, it's only used internally to
@@ -288,5 +332,6 @@ var newInstancePrototype = function(_instancePrototype, _data, _state) {
   instance.data  = _data  || {};
   //TODO: New nur ohne id
   instance.state = _state || 'new';
+  instance.errors = [];
   return instance;
 }
