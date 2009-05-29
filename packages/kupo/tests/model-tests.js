@@ -244,3 +244,123 @@ exports.testPersistence = {
   }
   
 }
+
+
+exports.testCallbacks = {
+
+  setup : function() {
+    this.callbacks = {}
+    this.Foo = Model.define('foo',{
+      callbacks : this.callbacks
+    })
+  },
+
+  testBeforeValidation : function() {
+    //TODO Implement validation
+  },
+
+  testBeforeValidation_on_create : function() {
+    //TODO Implement validation
+  },
+
+  testBeforeValidation_on_update : function() {
+    //TODO Implement validation
+  },
+
+  testAfterValidation : function() {
+    //TODO Implement validation
+  },
+
+  testAfterValidation_on_create : function() {
+    //TODO Implement validation
+  },
+
+  testAfterValidation_on_update : function() {
+    //TODO Implement validation
+  },
+
+  testBeforeSave : function() {
+    this.callbacks['beforeSave'] = function() {
+        this.set('b', 2);
+        this.set('state', this.state);
+      };
+    var p = this.Foo.makeNew({a:1});
+    p.save();
+    assert.isEqual(2, p.get('b'));
+    assert.isEqual('new', p.get('state'));
+  },
+
+  testBeforeCreate : function() {
+    this.callbacks['beforeCreate'] = function() {
+        this.set('b', 2);
+        this.set('state', this.state);
+      };
+    var p = this.Foo.create({a:1});
+    assert.isEqual(2, p.get('b'));
+    assert.isEqual('new', p.get('state'));
+  },
+
+  testBeforeUpdate : function() {
+    this.callbacks['beforeUpdate'] = function() {
+        this.set('b', 2);
+        this.set('state', this.state);
+      };
+    var p = this.Foo.create({a:1});
+    p.set('c', 3);
+    p.save();
+    assert.isEqual(2, p.get('b'));
+    assert.isEqual('dirty', p.get('state'));
+  },
+
+  testAfterCreate : function() {
+    var flag = false;
+    this.callbacks['afterCreate'] = function() {
+        flag = (this.state == 'clean' && this.data._id != null);
+      };
+    var p = this.Foo.create({a:1});
+    p.save();
+    assert.isTrue(flag);
+  },
+
+  testAfterUpdate : function() {
+    this.callbacks['afterUpdate'] = function() {
+        flag = (this.state == 'clean' && this.data._id != null);
+      };
+    var flag = false;
+    var p = this.Foo.create({a:1});
+    p.set('c', 3);
+    p.save();
+    assert.isTrue(flag);
+  },
+
+  testAfterSave : function() {
+    this.callbacks['afterSave'] = function() {
+        flag = (this.state == 'clean' && this.data._id != null);
+      };
+    var flag = false;
+    var p = this.Foo.makeNew({a:1});
+    p.save();
+    assert.isTrue(flag);
+  },
+
+  testBeforeRemove : function() {
+    this.callbacks['beforeRemove'] = function() {
+        flag = (this.state != 'removed' && this.data._id != null);
+      };
+    var flag = false;
+    var p = this.Foo.create({a:1});
+    p.remove()
+    assert.isTrue(flag);
+  },
+
+  testAfterRemove : function() {
+    this.callbacks['afterRemove'] = function() {
+        flag = (this.state == 'removed' && this.data._id != null);
+      };
+    var flag = false;
+    var p = this.Foo.create({a:1});
+    p.remove()
+    assert.isTrue(flag);
+  },
+
+}

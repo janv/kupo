@@ -41,8 +41,8 @@ var ClassPrototype = exports.Model = {
  *   - afterCreate
  *   - afterUpdate
  *   - afterSave
- *   - beforeDestroy
- *   - afterDestroy
+ *   - beforeRemove
+ *   - afterRemove
  *   TODO: Store the model callbacks somewhere else
  * o DO NOT OVERWRITE
  */
@@ -190,27 +190,33 @@ CommonInstancePrototype.save = function() {
   switch (this.state) {
     case 'new':
       delete(this.data['_id']);
+      this.model.callBack(this, 'beforeCreate');
+      this.model.callBack(this, 'beforeSave');
       this.data = c.insert(this.data);
       this.state = 'clean'
+      this.model.callBack(this, 'afterSave');
+      this.model.callBack(this, 'afterCreate');
       return true;
     case 'dirty':
+      this.model.callBack(this, 'beforeUpdate');
+      this.model.callBack(this, 'beforeSave');
       this.data = c.update({'_id': this.data._id}, this.data, true, true);
       this.state = 'clean'
+      this.model.callBack(this, 'afterSave');
+      this.model.callBack(this, 'afterUpdate');
       return true;
     case 'clean':
       return false;
     case 'removed':
       return false;
-      break;
   }
 }
 
 CommonInstancePrototype.remove = function() {
-  if (this.state != 'new') {
-    var c = this.model.collection();
-    c.remove({'_id' : this.data['_id']});
-  }
+  this.model.callBack(this, 'beforeRemove');
+  if (this.state != 'new') this.model.collection().remove({'_id' : this.data['_id']});
   this.state = 'removed';
+  this.model.callBack(this, 'afterRemove');
 }
 
 /**
