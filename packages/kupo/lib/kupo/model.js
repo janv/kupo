@@ -88,15 +88,15 @@ ClassPrototype.rpcCallable = function(name) {
 }
 
 /**
- * Used by the ResourceController to call callbacks defined in the model on
- * the Controller instance. Do not call or overwrite.
+ * Used to call callbacks defined in the model on
+ * the instances. Do not call or overwrite.
  *
  * @private
  */
-ClassPrototype.controllerCallback = function(controllerInstance, _callback){
+ClassPrototype.callBack = function(context, _callback){
   if (this.specialization.callbacks
       && this.specialization.callbacks[_callback]) {
-    this.specialization.callbacks[_callback].apply(controllerInstance)
+    this.specialization.callbacks[_callback].apply(context);
   }
 }
 

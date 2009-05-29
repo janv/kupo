@@ -77,10 +77,10 @@ exports.testControllerCallbacks = function() {
   var context = {};
   assert.isTrue(!context.beforeProcessExecuted);
   assert.isTrue(!context.afterProcessExecuted);
-  Project.controllerCallback(context, 'beforeProcess');
+  Project.callBack(context, 'beforeProcess');
   assert.isTrue(context.beforeProcessExecuted);
   assert.isTrue(!context.afterProcessExecuted);
-  Project.controllerCallback(context, 'afterProcess');
+  Project.callBack(context, 'afterProcess');
   assert.isTrue(context.beforeProcessExecuted);
   assert.isTrue(context.afterProcessExecuted);
   // TODO  beforeFind afterFind beforeAll afterAll

@@ -49,7 +49,7 @@ ResourceController.requestInstance = function(_model){
  * @private
  */
 ResourceController.process = function() {
-  this.model.controllerCallback(this, 'beforeProcess')
+  this.model.callBack(this, 'beforeProcess')
   
   var method   = this.request.requestMethod()
   var urlparts = this.request.pathInfo().split('/')
@@ -92,7 +92,7 @@ ResourceController.processJRPC = function(target, jrpcRequest){
   if (typeof target[jrpcRequest.getMethodName()] == 'function') {
     if (this.model.rpcCallable(jrpcRequest.getMethodName())) {
       this.result = jrpcRequest.call(target)
-      this.model.controllerCallback(this, 'afterProcess')
+      this.model.callBack(this, 'afterProcess')
       //TODO Wenn models zurückgegeben werden, diese irgendwie auspacken, nur die Daten verschicken
       return JRPCRequest.buildResponse(200, this.result);
     } else {
@@ -111,9 +111,9 @@ ResourceController.processJRPC = function(target, jrpcRequest){
  */
 ResourceController.index = function(){
   if (!this.model.rpcCallable('all')) throw new Errors.ForbiddenError("Method all is not callable remotely on " + this.model.name)
-  this.model.controllerCallback(this, 'beforeAll')
+  this.model.callBack(this, 'beforeAll')
   this.collection = this.model.all()
-  this.model.controllerCallback(this, 'afterAll')
+  this.model.callBack(this, 'afterAll')
   return JRPCRequest.buildResponse(200, this.collection)
 };
 
@@ -125,8 +125,8 @@ ResourceController.index = function(){
  */
 ResourceController.show  = function(id){
   if (!this.model.rpcCallable('find')) throw new Errors.ForbiddenError("Method find is not callable remotely on " + this.model.name)
-  this.model.controllerCallback(this, 'beforeFind')
+  this.model.callBack(this, 'beforeFind')
   this.object = this.model.find(id)
-  this.model.controllerCallback(this, 'afterFind')
+  this.model.callBack(this, 'afterFind')
   return JRPCRequest.buildResponse(200, this.object ) //TODO Wenn models zurückgegeben werden, diese irgendwie auspacken, nur die Daten verschicken
 };
