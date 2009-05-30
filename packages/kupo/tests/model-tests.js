@@ -7,7 +7,12 @@ var Model  = require("kupo/model").Model;
 
 var Project = Model.define('project',{
   instance: {
-    callables: ['finish']
+    callables: ['finish'],
+    methods: {
+      incrementA : function() {
+        this.set('a', this.get('a')+1);
+      }
+    } 
   },
   callables: ['blubb'],
   callbacks: {
@@ -69,8 +74,15 @@ exports.testDefinition = {
   testInstRefersSpecAndModel : function() {
     assert.isEqual(Project, Project.instancePrototype.model);
     assert.isEqual(Project.specialization.instance, Project.instancePrototype.instanceSpec);
-  }
+  },
   
+  testInstanceMethods : function() {
+    var p = Project.makeNew({a:1})
+    assert.isEqual('function', typeof p.incrementA);
+    assert.isEqual(1, p.get('a'));
+    p.incrementA();
+    assert.isEqual(2, p.get('a'));
+  }
 }
 
 exports.testControllerCallbacks = function() {

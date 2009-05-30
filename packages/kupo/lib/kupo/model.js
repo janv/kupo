@@ -133,6 +133,13 @@ ClassPrototype.create = function(data) {
   return i;
 }
 
+
+
+
+
+
+
+
 // Common instance prototype /////////////////////////////////////////////////
 
 /**
@@ -156,9 +163,24 @@ var CommonInstancePrototype = {
  */
 CommonInstancePrototype.derive = function(_instanceSpec, _model){
   var ip = Support.clone(CommonInstancePrototype);
-  ip.instanceSpec = _instanceSpec; //TODO CamelCase
+  ip.instanceSpec = _instanceSpec;
   ip.model = _model;
+  if (ip.instanceSpec) ip.extractMethods(ip.instanceSpec.methods);
   return ip;
+}
+
+/**
+ * Used to add methods defined in InstanceSpec.methods to the CommonInstancePrototype
+ *
+ * @private
+ */
+CommonInstancePrototype.extractMethods = function(origin) {
+  if (typeof origin == 'object') {
+    for (var m in origin) {
+      if (CommonInstancePrototype[m] == undefined) this[m] = origin[m];
+      // else throw new Errors.InternalError("Can't overwrite Methods of the common instance prototype");
+    }
+  }
 }
 
 /**
