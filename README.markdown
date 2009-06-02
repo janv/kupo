@@ -24,8 +24,8 @@ To install *Kupo*, just place the source directory somewhere and make sure the c
 3. `git submodule init`
 3. `git submodule update`
 
-[jack]: http://github.com/tlrobinson/jack/master
-[narwhal]: http://github.com/tlrobinson/narwhal/master
+[jack]: http://github.com/janv/jack/master
+[narwhal]: http://github.com/janv/narwhal/master
 
 After having installed *Kupo*, run it using the `./start` script
 
