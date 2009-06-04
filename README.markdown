@@ -34,6 +34,19 @@ Overview
 
 Requests are handled by the dispatcher's `handle` method which uses the fetcher to load a custom controller or model identified by the url. If no custom controller is found, a matching model is handed to the resource controller to for processing RPC calls. A variety of callbacks defined in the models can be used to influence request processing in the scope of the resource controller or the model's lifecycle.
 
+Tests
+------------------------------------------------------------------------------
+
+*Kupo* has tests. To run them you need to:
+
+1. Start mongod using `./mongod --dbpath /path/to/kupo/db run`
+2. Change to `/path/to/kupo/packages/kupo/tests`
+3. Run `../../narwhal/bin/narwhal .`
+
+The tests are covering the persistence and model aspects of *Kupo*, mainly
+everything in mongo_adapter.js and model.js.
+
+
 License
 ------------------------------------------------------------------------------
 
