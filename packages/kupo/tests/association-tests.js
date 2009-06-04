@@ -85,10 +85,43 @@ exports.testBelongsTo = {
   
   testDisallowWrongModels : function() {
     
+  },
+  
+  testSkipCache : function() {
+    
   }
     
 }
 
+exports.testHasMany = {
+  setup : function() {
+    this.Task = Model.define('task', {});
+    this.User = Model.define('user', {
+      associations : {
+        "tasks" : Model.has_many(this.Task)
+      }
+    });
+    // Bolt on the dependency, this is handled by require()'s circular dependency
+    // solver in production
+    Model.belongs_to(this.User).apply(this.Task.instancePrototype, ['user']);
+    
+    this.User.collection().drop();
+    this.Task.collection().drop();
+    this.u = this.User.create({'name': "Hans Wurst"});
+  },
+  
+  testFindSimple : function() {
+    var t1 = this.Task.makeNew({'topic': 'Topic1'});
+    var t2 = this.Task.makeNew({'topic': 'Topic2'});
+    t1.setUser(this.u); t2.setUser(this.u);
+    t1.save();          t2.save();
+    var tasks = this.u.getTasks();
+    assert.isEqual(2, tasks.length);
+    assert.isEqual('Topic1', tasks[0].get('topic'));
+    assert.isEqual('Topic2', tasks[1].get('topic'));
+  }
+  
+}
+
 // exports.testHasOne = null;
-// exports.testHasMany = null;
 // exports.testBelongsToMany = null;

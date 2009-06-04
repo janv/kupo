@@ -444,3 +444,25 @@ exports.Model.belongs_to = function(model, options) {
     }
   }
 }
+
+/**
+ * Creates a belongs-to association to be stored in the specialization.associations
+ * under the associations name.
+ * Pass the model you want to associate with. Actually returns a initialization
+ * function that gets called upon intitialization of the InstancePrototype and augments
+ * it with accessors for the association.
+ */
+exports.Model.has_many = function(model, options) {
+  // this gets called in the context of the Instance Prototype, creating the
+  // accessor functions
+  return function(assocName) {
+    var ownKey = this.model.name + "_id"
+
+    //create get Function
+    this['get' + Support.capitalize(assocName) ] = function() {
+      var ref = {};
+      ref[ownKey] = this.get('_id');
+      return model.all(ref);
+    }
+  }
+}
