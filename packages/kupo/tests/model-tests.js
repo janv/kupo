@@ -95,6 +95,12 @@ exports.testDefinition = {
     var t = Task.makeNew();
     assert.isEqual('function', typeof t.setUser);
     assert.isEqual('function', typeof t.getUser);
+  },
+  
+  testAllDerivesFromInstancePrototype : function() {
+    var p = Project.create({a:1});
+    p = Project.all({})[0];
+    assert.isEqual(1, p.get('a'));
   }
 }
 

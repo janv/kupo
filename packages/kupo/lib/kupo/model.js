@@ -110,8 +110,9 @@ ClassPrototype.rpcCallable = function(name) {
 /** Pass a reference Object and returns a Mongo DBCursor */
 ClassPrototype.all = function(ref) {
   ref = ref || {};
+  var prot = this.instancePrototype;
   return this.collection().find(ref).map(function(o){
-    return newInstance(this.instancePrototype, o, 'clean');
+    return newInstance(prot, o, 'clean');
   })
 }
 
