@@ -98,10 +98,6 @@ exports.testControllerCallbacks = function() {
   // TODO  beforeFind afterFind beforeAll afterAll
 }
 
-exports.testModelCallbacks = function() {
-  
-}
-
 exports.testNewInstances = {
   testIsNew : function() {
     var p = Project.makeNew();
@@ -253,6 +249,13 @@ exports.testPersistence = {
     assert.isEqual('dirty', p.state);
     p.set('b', 2);
     assert.isEqual('dirty', p.state);
+  },
+  
+  testErasePreservesNew : function() {
+    var p = Project.makeNew({a:1});
+    assert.isEqual('new', p.state);
+    p.erase('a');
+    assert.isEqual('new', p.state);
   }
   
 }

@@ -319,7 +319,7 @@ CommonInstancePrototype.get = function(property) {
  */
 CommonInstancePrototype.erase = function(property) {
   delete(this.data[property]);
-  this.state = 'dirty';
+  if (this.state == 'clean' )this.state = 'dirty';
 }
 
 /**
