@@ -121,12 +121,17 @@ ClassPrototype.all = function(ref) {
   })
 }
 
-/** Pass a reference Object and returns the first found object */
+/** Pass a reference Object and returns the first found object (or null) */
 ClassPrototype.find = function(ref) {
   if (ref.toString().match(/^[abcdef\d]+$/)) {
-    return newInstance(this.instancePrototype, this.collection().findId(ref), 'clean');
+    var result = this.collection().findId(ref);
   } else {
-    return newInstance(this.instancePrototype, this.collection().findOne(ref), 'clean');
+    var result = this.collection().findOne(ref);
+  }
+  if (result == null) {
+    return result;
+  } else {
+    return newInstance(this.instancePrototype, result, 'clean');
   }
 }
 
