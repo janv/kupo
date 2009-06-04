@@ -5,12 +5,12 @@ var Project = Model.define('project',{
   },
   callables: ['blubb'],
   callbacks: {
-    beforeProcess: function(){
+    beforeProcess: [function(){
       print('PROJECT beforeProcess callback executing')
-    },
-    afterProcess: function(){
+    }],
+    afterProcess: [function(){
       print('PROJECT afterProcess callback executing')
-    }
+    }]
   }
 });
 

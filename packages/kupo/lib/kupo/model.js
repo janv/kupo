@@ -93,12 +93,15 @@ ClassPrototype.rpcCallable = function(name) {
  *
  * @private
  */
-ClassPrototype.callBack = function(context, _callback){
-  if (this.specialization.callbacks
-      && this.specialization.callbacks[_callback]) {
-    this.specialization.callbacks[_callback].apply(context);
-  }
-}
+ ClassPrototype.callBack = function(context, _callback){
+   if (this.specialization.callbacks
+       && this.specialization.callbacks[_callback]) {
+     var callbacks = this.specialization.callbacks[_callback];
+     for (var i=0; i < callbacks.length; i++) {
+       callbacks[i].apply(context)
+     };
+   }
+ }
 
 // Persistence stuff
 

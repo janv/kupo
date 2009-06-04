@@ -16,12 +16,12 @@ var Project = Model.define('project',{
   },
   callables: ['blubb'],
   callbacks: {
-    beforeProcess: function(){
+    beforeProcess: [function(){
       this.beforeProcessExecuted = true;
-    },
-    afterProcess: function(){
+    }],
+    afterProcess: [function(){
       this.afterProcessExecuted = true;
-    }
+    }]
   }
 });
 
@@ -294,10 +294,10 @@ exports.testCallbacks = {
   // },
 
   testBeforeSave : function() {
-    this.callbacks['beforeSave'] = function() {
+    this.callbacks['beforeSave'] = [function() {
         this.set('b', 2);
         this.set('state', this.state);
-      };
+      }];
     var p = this.Foo.makeNew({a:1});
     p.save();
     assert.isEqual(2, p.get('b'));
@@ -305,20 +305,20 @@ exports.testCallbacks = {
   },
 
   testBeforeCreate : function() {
-    this.callbacks['beforeCreate'] = function() {
+    this.callbacks['beforeCreate'] = [function() {
         this.set('b', 2);
         this.set('state', this.state);
-      };
+      }];
     var p = this.Foo.create({a:1});
     assert.isEqual(2, p.get('b'));
     assert.isEqual('new', p.get('state'));
   },
 
   testBeforeUpdate : function() {
-    this.callbacks['beforeUpdate'] = function() {
+    this.callbacks['beforeUpdate'] = [function() {
         this.set('b', 2);
         this.set('state', this.state);
-      };
+      }];
     var p = this.Foo.create({a:1});
     p.set('c', 3);
     p.save();
@@ -328,18 +328,18 @@ exports.testCallbacks = {
 
   testAfterCreate : function() {
     var flag = false;
-    this.callbacks['afterCreate'] = function() {
+    this.callbacks['afterCreate'] = [function() {
         flag = (this.state == 'clean' && this.data._id != null);
-      };
+      }];
     var p = this.Foo.create({a:1});
     p.save();
     assert.isTrue(flag);
   },
 
   testAfterUpdate : function() {
-    this.callbacks['afterUpdate'] = function() {
+    this.callbacks['afterUpdate'] = [function() {
         flag = (this.state == 'clean' && this.data._id != null);
-      };
+      }];
     var flag = false;
     var p = this.Foo.create({a:1});
     p.set('c', 3);
@@ -348,9 +348,9 @@ exports.testCallbacks = {
   },
 
   testAfterSave : function() {
-    this.callbacks['afterSave'] = function() {
+    this.callbacks['afterSave'] = [function() {
         flag = (this.state == 'clean' && this.data._id != null);
-      };
+      }];
     var flag = false;
     var p = this.Foo.makeNew({a:1});
     p.save();
@@ -358,9 +358,9 @@ exports.testCallbacks = {
   },
 
   testBeforeRemove : function() {
-    this.callbacks['beforeRemove'] = function() {
+    this.callbacks['beforeRemove'] = [function() {
         flag = (this.state != 'removed' && this.data._id != null);
-      };
+      }];
     var flag = false;
     var p = this.Foo.create({a:1});
     p.remove()
@@ -368,9 +368,9 @@ exports.testCallbacks = {
   },
 
   testAfterRemove : function() {
-    this.callbacks['afterRemove'] = function() {
+    this.callbacks['afterRemove'] = [function() {
         flag = (this.state == 'removed' && this.data._id != null);
-      };
+      }];
     var flag = false;
     var p = this.Foo.create({a:1});
     p.remove()
