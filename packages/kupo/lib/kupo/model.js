@@ -70,6 +70,12 @@ ClassPrototype.initSpecialization = function(){
   this.instancePrototype = CommonInstancePrototype.derive(this.specialization.instance, this);
 }
 
+ClassPrototype.capitalize = function() {
+  var head = this.name.charAt(0).toUpperCase();
+  var tail = this.name.slice(1);
+  return head + tail;
+}
+
 /**
  * Returns true if the named function is remotely callable on the instance
  *
