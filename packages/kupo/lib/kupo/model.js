@@ -166,7 +166,9 @@ ClassPrototype.create = function(data) {
  * @class
  */
 var CommonInstancePrototype = {
+  "associationCache" : {},
   "defaultCallables" : ['update'],
+  "errors" : [],
   "state" : 'new' // new, clean, dirty, removed
 }
 
@@ -182,8 +184,17 @@ CommonInstancePrototype.derive = function(_instanceSpec, _model){
   var ip = Support.clone(CommonInstancePrototype);
   ip.instanceSpec = _instanceSpec;
   ip.model = _model;
+  ip.installAssociations();
   if (ip.instanceSpec) ip.extractMethods(ip.instanceSpec.methods);
   return ip;
+}
+
+// Call only on Instance Prototype, otherwise the assocs are installed on the 
+// Common Instance prototype
+CommonInstancePrototype.installAssociations = function() {
+  for (var a in this.model.specialization.associations) {
+    this.model.specialization.associations[a].apply(this, [a]);
+  }
 }
 
 /**
@@ -372,5 +383,69 @@ var newInstance = function(_instancePrototype, _data, _state) {
   //TODO: New nur ohne id
   instance.state = _state || 'new';
   instance.errors = [];
+  instance.associationCache = {};
   return instance;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Associations //////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Creates a belongs-to association to be stored in the specialization.associations
+ * under the associations name.
+ * Pass the model you want to associate with. Actually returns a initialization
+ * function that gets called upon intitialization of the InstancePrototype and augments
+ * it with accessors for the association.
+ */
+exports.Model.belongs_to = function(model, options) {
+  var foreignKey = model.name + "_id"
+  
+  // this gets called in the context of the Instance Prototype, creating the
+  // accessor functions
+  return function(assocName) {
+    //create set Function
+    /**
+     * Sets the association to an object or an id.
+     * Pass in null to remove the association.
+     */
+    this['set' + model.capitalize()] = function(idOrInstance) {
+      if (idOrInstance == null) {
+        this.erase(foreignKey);
+        delete(this.associationCache[assocName]);
+      } else if (idOrInstance.toString().match(/^[abcdef\d]+$/)) {
+        this.set(foreignKey, idOrInstance.toString());
+      } else {
+        if (idOrInstance.state != 'removed') {
+          this.set(foreignKey, idOrInstance.get('_id'));
+          this.associationCache[assocName] = idOrInstance;
+        }
+      }
+    }
+    
+    //create get Function
+    /**
+     * Returns the instance referenced by the association.
+     */
+    this['get' + model.capitalize()] = function(skipCache) {
+      if (!this.associationCache[assocName] || (skipCache == true)) {
+        if (this.get(foreignKey) == null) return null;
+        this.associationCache[assocName] = model.find(this.get(foreignKey));
+      }
+      return this.associationCache[assocName];
+    }
+    
+    //install save callback
+    var callback = function() {
+      var assoc = this['get' + model.capitalize()]();
+      if (assoc) assoc.save();
+    }
+    
+    if (!this.model.specialization.callbacks) this.model.specialization.callbacks = {}
+    if (this.model.specialization.callbacks['beforeSave']) {
+      this.model.specialization.callbacks['beforeSave'].push(callback);
+    } else {
+      this.model.specialization.callbacks['beforeSave'] = [callback];
+    }
+  }
 }

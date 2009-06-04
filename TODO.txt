@@ -6,19 +6,7 @@ TODO
   - Support nested structures
   - Associations
   - Validations
-    - Definitions
-    - Execution
-    - Error-objects
     - Implementation in ResourceController
-  - Implement model callbacks
-   - Execution
-   - Exceptions
-
-- Testing
-  - Write small framework
-  - See if Jack can operate in a simulated mode
-  - See how to run everything in shellmode
-  - Write tests
 
 - Static Asset delivery
   - In Dispatcher check for

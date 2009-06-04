@@ -82,6 +82,19 @@ exports.testDefinition = {
     assert.isEqual(1, p.get('a'));
     p.incrementA();
     assert.isEqual(2, p.get('a'));
+  },
+  
+  testInstallsAssociations : function() {
+    var User = Model.define('user', {
+    });
+    var Task = Model.define('task', {
+      associations : {
+        "user" : Model.belongs_to(User)
+      }
+    });
+    var t = Task.makeNew();
+    assert.isEqual('function', typeof t.setUser);
+    assert.isEqual('function', typeof t.getUser);
   }
 }
 

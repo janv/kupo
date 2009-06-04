@@ -1,0 +1,94 @@
+var jsDump = require('test/jsdump').jsDump;
+var assert = require("test/assert");
+require("kupo/mongo_adapter").MongoAdapter.setConnection("kupo_test");
+var Model  = require("kupo/model").Model;
+
+// Sample Model //////////////////////////////////////////////////////////////
+
+exports.testBelongsTo = {
+  setup : function() {
+    this.User = Model.define('user', {});
+    this.Task = Model.define('task', {
+      associations : {
+        "user" : Model.belongs_to(this.User)
+      }
+    });
+    this.User.collection().drop();
+    this.Task.collection().drop();
+    this.u = this.User.create({'name': "Hans Wurst"});
+  },
+  
+  testSetSaved : function() {
+    var t = this.Task.makeNew({'topic': 'Whatever'});
+    t.setUser(this.u);
+    assert.isEqual(this.u.get('_id'), t.get('user_id'));
+    assert.isTrue(t.save())
+    assert.isEqual("Hans Wurst", t.getUser().get('name'));
+  },
+  
+  testSetInvalidId : function() {
+    this.u.remove();
+    var t = this.Task.makeNew({'topic': 'Whatever'});
+    
+    t.setUser(this.u.get('_id'));
+    assert.isTrue(null == t.getUser());
+  },
+  
+  testSetRemoved : function() {
+    this.u.remove();
+    var t = this.Task.makeNew({'topic': 'Whatever'});
+    
+    t.setUser(this.u);
+    assert.isTrue(null == t.getUser());
+  },
+  
+  testSetUnsaved : function() {
+    //auf ungespeichertes Objekt setzen
+    var u = this.User.makeNew({'name': 'Gerda'});
+    var t = this.Task.makeNew({'topic': 'Whatever'});
+    
+    t.setUser(u);
+    assert.isEqual(u, t.getUser());
+    assert.isTrue(t.save());
+    assert.isEqual('clean', u.state);
+  },
+  
+  testReset : function() {
+    var t = this.Task.makeNew({'topic': 'Whatever'});
+    t.setUser(this.u);
+    t.save();
+    var u = this.User.makeNew({'name': 'Gerda'});
+    
+    t.setUser(u);
+    assert.isTrue(t.save());    
+    assert.isEqual('clean', u.state);
+    assert.isEqual(u, t.getUser());
+  },
+  
+  testSetNull : function() {
+    var t = this.Task.makeNew({'topic': 'Whatever'});
+    t.setUser(null);
+
+    assert.isTrue(t.save());    
+    assert.isTrue(null == t.getUser());
+    assert.isTrue(!t.data.hasOwnProperty('user_id'));
+  },
+  
+  testSurvivesReload : function() {
+    var t = this.Task.makeNew({'topic': 'Whatever'});
+    t.setUser(this.u);
+    t.save();
+    
+    t = this.Task.find({});
+    assert.isEqual("Hans Wurst", t.getUser().get('name'));    
+  },
+  
+  testDisallowWrongModels : function() {
+    
+  }
+    
+}
+
+// exports.testHasOne = null;
+// exports.testHasMany = null;
+// exports.testBelongsToMany = null;

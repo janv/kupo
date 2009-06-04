@@ -9,5 +9,6 @@ global.pp = function (x) {
 
 exports.testMongoAdapter = require("./mongo_adapter-tests");
 exports.testModel = require("./model-tests");
+exports.testAssociations = require("./association-tests");
 
 require("os").exit(require("test/runner").run(exports));
