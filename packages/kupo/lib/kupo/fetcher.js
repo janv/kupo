@@ -1,4 +1,5 @@
 var Fetcher = exports.Fetcher = {}
+var Support = require('kupo/support').Support;
 
 //TODO: Deprecated, replace by proper Error from errors.js
 var FetchError = function(_name, _type){
@@ -35,9 +36,7 @@ var filename = function(name, type) {
  * @param type {String} The type of object to load, 'controller' for a controller, 'model' for a model
  */
 var varName = function(name, type) {
-  var head = name.charAt(0).toUpperCase()
-  var tail = name.slice(1)
-  name = head + tail
+  name = Support.capitalize(name)
   if (type == "controller") name += "Controller"
   return name
 }

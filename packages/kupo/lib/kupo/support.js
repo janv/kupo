@@ -9,3 +9,8 @@ Support.clone = function(object) {
   return new F();
 }
 
+Support.capitalize = function(s) {
+  var head = s.charAt(0).toUpperCase();
+  var tail = s.slice(1);
+  return head + tail;
+}

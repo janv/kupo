@@ -70,12 +70,6 @@ ClassPrototype.initSpecialization = function(){
   this.instancePrototype = CommonInstancePrototype.derive(this.specialization.instance, this);
 }
 
-ClassPrototype.capitalize = function() {
-  var head = this.name.charAt(0).toUpperCase();
-  var tail = this.name.slice(1);
-  return head + tail;
-}
-
 /**
  * Returns true if the named function is remotely callable on the instance
  *
@@ -409,7 +403,7 @@ exports.Model.belongs_to = function(model, options) {
      * Sets the association to an object or an id.
      * Pass in null to remove the association.
      */
-    this['set' + model.capitalize()] = function(idOrInstance) {
+    this['set' + Support.capitalize(assocName)] = function(idOrInstance) {
       if (idOrInstance == null) {
         this.erase(foreignKey);
         delete(this.associationCache[assocName]);
@@ -427,7 +421,7 @@ exports.Model.belongs_to = function(model, options) {
     /**
      * Returns the instance referenced by the association.
      */
-    this['get' + model.capitalize()] = function(skipCache) {
+    this['get' + Support.capitalize(assocName)] = function(skipCache) {
       if (!this.associationCache[assocName] || (skipCache == true)) {
         if (this.get(foreignKey) == null) return null;
         this.associationCache[assocName] = model.find(this.get(foreignKey));
@@ -437,7 +431,7 @@ exports.Model.belongs_to = function(model, options) {
     
     //install save callback
     var callback = function() {
-      var assoc = this['get' + model.capitalize()]();
+      var assoc = this['get' + Support.capitalize(assocName)]();
       if (assoc) assoc.save();
     }
     
