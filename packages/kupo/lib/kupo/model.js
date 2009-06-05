@@ -334,7 +334,7 @@ CommonInstancePrototype.set = function(prop, value) {
       }      
     }
   }
-  if (this.state == 'clean') this.state = 'dirty';
+  this.taint();
 }
 
 /**
@@ -345,11 +345,18 @@ CommonInstancePrototype.get = function(property) {
 }
 
 /**
+ * Mark this instance as dirty, indicating that it should be saved.
+ */
+CommonInstancePrototype.taint = function() {
+  if (this.state == 'clean') this.state = 'dirty';
+}
+
+/**
  * Erase a property of this instance.
  */
 CommonInstancePrototype.erase = function(property) {
   delete(this.data[property]);
-  if (this.state == 'clean' )this.state = 'dirty';
+  this.taint();
 }
 
 /**
