@@ -303,7 +303,7 @@ CommonInstancePrototype.set = function(prop, value) {
     if (prop != '_id' && prop != "_ns") this.data[prop] = value;
   } else {
     var newData = prop, overwrite = value;
-    delete(newData['_id']);
+    delete(newData['_id']); //TODO: Ooops, hier wird auch aus dem Original gelöscht, baad
     delete(newData['_ns']);
     if (overwrite == true){
       newData._id = this.data._id;
@@ -464,5 +464,16 @@ exports.Model.has_many = function(model, options) {
       ref[ownKey] = this.get('_id');
       return model.all(ref);
     }
+    
+    //create add Function
+    this['addTo' + Support.capitalize(assocName) ] = function(objects) {
+      if (!(objects instanceof Array)) objects = [objects];
+      for (var i=0; i < objects.length; i++) {
+        objects[i].set(ownKey, this.get('_id'));
+        objects[i].save();
+      };
+    }
+    
+    
   }
 }

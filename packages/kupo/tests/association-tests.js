@@ -119,6 +119,46 @@ exports.testHasMany = {
     assert.isEqual(2, tasks.length);
     assert.isEqual('Topic1', tasks[0].get('topic'));
     assert.isEqual('Topic2', tasks[1].get('topic'));
+  },
+  
+  testAddExisting : function() {
+    var t = this.Task.create({'topic': 'Whatever'});
+    this.u.addToTasks(t);
+    assert.isEqual('clean', this.u.state);
+    assert.isEqual(this.u.get('_id'), t.get('user_id'));
+    assert.isEqual(this.u.get('_id'), this.u.getTasks()[0].get('user_id'));
+  },
+  
+  testAddNew : function() {
+    var t = this.Task.makeNew({'topic': 'Whatever'});
+    this.u.addToTasks(t);
+    assert.isEqual('clean', this.u.state);
+    assert.isEqual(this.u.get('_id'), t.get('user_id'));
+    assert.isEqual(this.u.get('_id'), this.u.getTasks()[0].get('user_id'));    
+  },
+  
+  testAddNewtoNew : function() {
+    
+  },
+  
+  testAddExistingToNew : function() {
+    
+  },
+  
+  testRemoveExisting : function() {
+    
+  },
+  
+  testRemoveNew : function() {
+    
+  },
+  
+  testAddNull : function() {
+    
+  },
+  
+  testAddMultiple : function() {
+    
   }
   
 }
