@@ -479,22 +479,42 @@ exports.Model.has_many = function(model, options) {
   return function(assocName) {
     var ownKey = this.model.name + "_id"
 
+    this.unsavedHasManyAssociations = [];
+    this.unsavedHasManyCallbacks    = [];
+    
     //create get Function
     this['get' + Support.capitalize(assocName) ] = function() {
       var ref = {};
       ref[ownKey] = this.get('_id');
-      return model.all(ref);
+      var arr = this.unsavedHasManyAssociations.concat(model.all(ref));
+      return arr;
     }
     
     //create add Function
     this['addTo' + Support.capitalize(assocName) ] = function(objects) {
       if (!(objects instanceof Array)) objects = [objects];
       for (var i=0; i < objects.length; i++) {
-        objects[i].set(ownKey, this.get('_id'));
-        objects[i].save();
+        var o = objects[i];
+        if (this.state == 'clean') { // We have an id, assign it immediately
+          o.set(ownKey, this.get('_id'));
+        } else { // We don't have an id, defer assignment to afterSave
+          this.unsavedHasManyCallbacks.push(function(host){ o.set(ownKey, host.get('_id'));});
+        }
+        this.unsavedHasManyCallbacks.push(function(){ o.save();});
+        this.unsavedHasManyAssociations.push(o);
       };
+      this.taint();
     }
     
+    //install save callback
+    var callback = function() {
+      for (var i=0; i < this.unsavedHasManyCallbacks.length; i++) {
+        this.unsavedHasManyCallbacks[i](this);
+      };
+      this.unsavedHasManyAssociations = [];
+      this.unsavedHasManyCallbacks    = [];
+    }
     
+    this.model.installCallback('afterSave', callback);    
   }
 }
