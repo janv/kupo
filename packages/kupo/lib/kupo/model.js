@@ -105,6 +105,25 @@ ClassPrototype.rpcCallable = function(name) {
    }
  }
 
+
+/**
+ * Pushes a callback to the end of one of the callback chains
+ *
+ * @param name Name of the callback chain, eg. 'afterSave'
+ * @param fun  The callback-function to add
+ */
+ClassPrototype.installCallback = function(name, fun) {
+  if (!this.specialization.callbacks) {
+    this.specialization.callbacks = {};
+  }
+  if (this.specialization.callbacks[name]) {
+    this.specialization.callbacks[name].push(fun);
+  } else {
+    this.specialization.callbacks[name] = [fun];
+  }  
+}
+
+
 // Persistence stuff
 
 /** Pass a reference Object and returns a Mongo DBCursor */
@@ -436,12 +455,7 @@ exports.Model.belongs_to = function(model, options) {
       if (assoc) assoc.save();
     }
     
-    if (!this.model.specialization.callbacks) this.model.specialization.callbacks = {}
-    if (this.model.specialization.callbacks['beforeSave']) {
-      this.model.specialization.callbacks['beforeSave'].push(callback);
-    } else {
-      this.model.specialization.callbacks['beforeSave'] = [callback];
-    }
+    this.model.installCallback('beforeSave', callback);
   }
 }
 
