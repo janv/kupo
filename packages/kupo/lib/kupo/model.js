@@ -296,6 +296,9 @@ CommonInstancePrototype.save = function() {
   }
 }
 
+/**
+ * Remove this Instance from the database
+ */
 CommonInstancePrototype.remove = function() {
   this.model.callBack(this, 'beforeRemove');
   if (this.state != 'new') this.model.collection().remove({'_id' : this.data['_id']});
