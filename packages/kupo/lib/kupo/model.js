@@ -487,9 +487,14 @@ exports.Model.has_many = function(model, options) {
     
     //create get Function
     this['get' + Support.capitalize(assocName) ] = function() {
-      var ref = {};
-      ref[ownKey] = this.get('_id');
-      var arr = this.unsavedHasManyAssociations.concat(model.all(ref));
+      if (this.get('_id') != null) {
+        var ref = {};
+        ref[ownKey] = this.get('_id');
+        var dbobjects = model.all(ref);
+      } else {
+        var dbobjects = [];
+      }
+      var arr = this.unsavedHasManyAssociations.concat(dbobjects);
       return arr;
     }
     

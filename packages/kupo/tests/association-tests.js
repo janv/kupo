@@ -152,7 +152,19 @@ exports.testHasMany = {
   },
   
   testAddExistingToNew : function() {
-    
+    var u = this.User.makeNew({'name': 'Hans'});
+    assert.isEqual(0, u.getTasks().length, "GetTasks returns 0 before creating a task");    
+    var t = this.Task.create({'topic': 'Whatever'});
+    assert.isEqual(0, u.getTasks().length, "GetTasks returns 0 after creating a task");    
+    u.addToTasks(t);
+    assert.isEqual('new', u.state, "User is still new after adding Task");
+    assert.isEqual('clean', t.state, "Task is still clean after being added to user");
+    assert.isEqual(1, u.getTasks().length, "GetTasks returns one task before saving");    
+    u.save()
+    assert.isEqual('clean', u.state, "User is clean after saving");
+    assert.isEqual('clean', t.state, "Task is clean after saving user");
+    assert.isEqual(1, u.getTasks().length, "GetTasks returns one task after saving");
+    assert.isEqual(u.get('_id'), u.getTasks()[0].get('user_id'), "Task(from u.getTasks).user_id matches user._id");    
   },
   
   testRemoveExisting : function() {
