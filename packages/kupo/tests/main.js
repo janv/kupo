@@ -8,6 +8,7 @@ global.pp = function (x) {
 }
 
 exports.testMongoAdapter = require("./mongo_adapter-tests");
+exports.testMongoConverter = require("./mongo-converter-tests");
 exports.testModel = require("./model-tests");
 exports.testAssociations = require("./association-tests");
 

@@ -243,47 +243,46 @@ var createDoc = function(obj) {
  * @return {BasicDBObject} A Mongo BasicDBObject
  * @private
  */
-var convert =  function(obj) {
-  switch (typeof(obj)) {
-    case "string":
-      return obj; //Rhino konvertiert implizit in Java String
-    case "number":
-      return new java.lang.Double(obj)
-    case "boolean":
-      return new java.lang.Boolean(obj)
-    case "function":
-      throw new Errors.InternalError("Functions can not be serialized into BSON objects");
-    case "object":
-      if (obj === null) {
-        return null;
-      } else if (obj instanceof Number)  { 
-        return new java.lang.Double(obj);
-      } else if (obj instanceof Boolean)  { 
-        return new java.lang.Boolean(obj);
-      } else if (obj instanceof RegExp)  { 
-        throw new Errors.InternalError("Regular expressions can not be serialized into BSON objects");
-      } else if (obj instanceof String) { 
-        return obj;
-      } else if (obj instanceof Date) { 
-        return java.util.Date(obj)
-      } else if (obj instanceof Array) {
-        var arr = new BasicDBList();
-        for (var i=0; i < obj.length; i++) {
-          arr.put(i, arguments.callee(obj[i]));
-        };
-        return arr;
-      } else if (obj instanceof Object) {
-          var o = new BasicDBObject();
-          for (var p in obj) {
-            if (p == "_id") {
-              o.put(p, new Packages.com.mongodb.ObjectId(obj[p]));
-            } else {
-              o.put(p, arguments.callee(obj[p]));
-            }
-          }
-          return o;
-      }
-      break;
+var convert = exports.convert = function(obj) {
+  if (typeof(obj) == 'string' || obj instanceof String) {
+    if (obj.match(/^[0-9a-f]{24}$/i)) return new Packages.com.mongodb.ObjectId(obj);
+    return obj;
+  }
+  
+  if (typeof(obj) == 'number' || obj instanceof Number) {
+    return new java.lang.Double(obj);
+  }
+  
+  if (typeof(obj) == 'boolean' || obj instanceof Boolean) {
+    return new java.lang.Boolean(obj);
+  }
+  
+  if (typeof(obj) == 'function') {
+    throw new Errors.InternalError("Functions can not be serialized into BSON objects");
+  }
+  
+  if (obj === null) {
+    return null;
+  }
+  
+  if (obj instanceof Date) {
+    return java.util.Date(obj)
+  }
+  
+  if (obj instanceof Array) {
+    var arr = new BasicDBList();
+    for (var i=0; i < obj.length; i++) {
+      arr.put(i, arguments.callee(obj[i]));
+    };
+    return arr;
+  }
+  
+  if (obj instanceof Object) {
+    var o = new BasicDBObject();
+    for (var p in obj) {
+      o.put(p, arguments.callee(obj[p]));
+    }
+    return o;
   }
   return null;
 }
