@@ -498,20 +498,50 @@ exports.Model.has_many = function(model, options) {
       return arr;
     }
     
+    // Working with these Callback generators to prevent a weird scoping bug
+    // where changes in o in the loop would affect previously created callbacks
+    function setCallback(ownKey, ob) {
+      return function(host){ob.set(ownKey, host.get('_id'))};
+    };
+    function saveCallback(ob) {
+      return function() {ob.save()};
+    };
+    
     //create add Function
     this['addTo' + Support.capitalize(assocName) ] = function(objects) {
       if (!(objects instanceof Array)) objects = [objects];
       for (var i=0; i < objects.length; i++) {
         var o = objects[i];
-        if (this.state == 'clean') { // We have an id, assign it immediately
+        if (o == null) continue;
+        if (this.get('_id') != null) { // We have an id, assign it immediately
           o.set(ownKey, this.get('_id'));
         } else { // We don't have an id, defer assignment to afterSave
-          this.unsavedHasManyCallbacks.push(function(host){ o.set(ownKey, host.get('_id'));});
+          this.unsavedHasManyCallbacks.push(setCallback(ownKey, o));
         }
-        this.unsavedHasManyCallbacks.push(function(){ o.save();});
+        //TODO: Bei state == removed nen Fehler werfen
+        this.unsavedHasManyCallbacks.push(saveCallback(o));
         this.unsavedHasManyAssociations.push(o);
       };
-      this.taint();
+      if (this.unsavedHasManyCallbacks.length > 0) this.taint();
+    }
+    
+    
+    //create remove function
+    this['removeFrom' + Support.capitalize(assocName) ] = function(objects) {
+      if (!(objects instanceof Array)) objects = [objects];
+      for (var i=0; i < objects.length; i++) {
+        var o = objects[i];
+        //remove from Database
+        if (this.get('_id') != null && o.get(ownKey) == this.get('_id')) {
+          var originalState = o.state;
+          o.erase(ownKey);
+          if (originalState == 'clean') o.save();
+        }
+        //remove from Cache
+        for (var n=0; n < this.unsavedHasManyAssociations.length; n++) {
+          if (this.unsavedHasManyAssociations[n] == o) this.unsavedHasManyAssociations.splice(i,1)
+        };
+      };
     }
     
     //install save callback
@@ -523,6 +553,6 @@ exports.Model.has_many = function(model, options) {
       this.unsavedHasManyCallbacks    = [];
     }
     
-    this.model.installCallback('afterSave', callback);    
+    this.model.installCallback('afterSave', callback);
   }
 }
