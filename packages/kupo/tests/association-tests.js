@@ -128,8 +128,117 @@ exports.testBelongsTo = {
   testSkipCache : function() {
     //TODO Implement
   }
-  */  
 }
+
+exports.testBelongsToMany = {
+  setup : function() {
+    this.Task = Model.define('task', {});
+    this.User = Model.define('user', {
+      associations : {
+        "tasks" : Associations.belongsToMany(this.Task)
+      }
+    });
+    this.User.collection().drop();
+    this.Task.collection().drop();
+    this.u = this.User.create({'name': "Hans Wurst"});
+  },
+  
+  testGetSimple : function() {
+    var t1 = this.Task.create({"topic" : "Topic1"});
+    var t2 = this.Task.create({"topic" : "Topic2"});
+    this.u.set('tasks_ids', [t1.id(), t2.id()]);
+    assert.isEqual(2, this.u.tasks.get().length);
+  },
+
+  testAddSimpleOne : function() {
+    var t1 = this.Task.create({"topic" : "Topic1"});
+    this.u.tasks.add(t1);
+    assert.isEqual(1, this.u.tasks.get().length);
+  },
+
+  testAddSimpleTwo : function() {
+    var t1 = this.Task.create({"topic" : "Topic1"});
+    var t2 = this.Task.create({"topic" : "Topic2"});
+    this.u.tasks.add([t1, t2]);
+    assert.isEqual(2, this.u.tasks.get().length);
+  },
+  
+  testAddIds : function() {
+    var t1 = this.Task.create({"topic" : "Topic1"});
+    var t2 = this.Task.create({"topic" : "Topic2"});
+    this.u.tasks.add([t1.id(), t2.id()]);
+    assert.isEqual(2, this.u.tasks.get().length);
+  },
+  
+  testAddNull : function() {
+    this.u.tasks.add(null);
+    assert.isEqual(0, this.u.tasks.get().length);
+  },
+  
+  testAddExistingToNew : function() {
+    var u  = this.User.makeNew({"name" : "Heribert"});
+    var t1 = this.Task.create({"topic" : "Topic1"});
+    u.tasks.add(t1);
+    assert.isEqual(1, u.tasks.get().length);    
+  },
+  
+  testAddNewToNew : function() {
+    var u  = this.User.makeNew({"name" : "Heribert"});
+    var t1 = this.Task.makeNew({"topic" : "Topic1"});
+    u.tasks.add(t1);
+    assert.isEqual(1, u.tasks.get().length);
+    assert.isEqual('new', u.state);
+    assert.isEqual('new', t1.state);
+    u.save();
+    assert.isEqual('clean', u.state);
+    assert.isEqual('clean', t1.state);
+  },
+  
+  testAddNewToExisting : function() {
+    var u  = this.User.create({"name" : "Heribert"});
+    var t1 = this.Task.makeNew({"topic" : "Topic1"});
+    u.tasks.add(t1);
+    assert.isEqual(1, u.tasks.get().length);
+    assert.isEqual('dirty', u.state);
+    assert.isEqual('new', t1.state);
+    u.save();
+    assert.isEqual('clean', u.state);
+    assert.isEqual('clean', t1.state);
+  },
+  
+  testGetCombinesCacheAndDB : function() {
+    var t1 = this.Task.create({"topic" : "Topic1"});
+    this.u.tasks.add(t1);
+    this.u.save();
+    assert.isEqual('clean', this.u.state);
+    this.u.tasks.makeNew({"topic" : "Topic2"});
+    assert.isEqual(2, this.u.tasks.get(true).length);
+  },
+  
+  testSurvivesReload : function() {
+    var t1 = this.Task.create({"topic" : "Topic1"});
+    this.u.tasks.add(t1);
+    assert.isEqual(1, this.u.tasks.get().length);
+    this.u.save();
+    this.u = this.User.find({});
+    assert.isEqual(1, this.u.tasks.get().length);
+  },
+  
+  testRemoveExisting : function() {
+    var t1 = this.Task.create({"topic" : "Topic1"});
+    this.u.tasks.add(t1);
+    assert.isEqual(1, this.u.tasks.get().length);
+    this.u.tasks.remove(t1);
+  },
+  
+  testRemoveNew : function() {
+    var t = this.u.tasks.makeNew({"topic" : "Topic2"});
+    assert.isEqual(t, this.u.tasks.get()[0]);
+    assert.isEqual('dirty', this.u.state);
+    this.u.tasks.remove(t);
+    assert.isEqual(0, this.u.tasks.get().length);
+  }
+};
 
 /*
 
@@ -368,97 +477,5 @@ exports.testHasOne = {
     assert.isEqual('clean', this.u.state);
   }
 }
-
-exports.testBelongsToMany = {
-  setup : function() {
-    this.Task = Model.define('task', {});
-    this.User = Model.define('user', {
-      associations : {
-        "tasks" : Associations.belongsToMany(this.Task)
-      }
-    });
-    this.User.collection().drop();
-    this.Task.collection().drop();
-    this.u = this.User.create({'name': "Hans Wurst"});
-  },
-  
-  testGetSimple : function() {
-    var t1 = this.Task.create({"topic" : "Topic1"});
-    var t2 = this.Task.create({"topic" : "Topic2"});
-    this.u.set('task_ids', [t1.get('_id'), t2.get('_id')]);
-    assert.isEqual(2, this.u.getTasks().length);
-  },
-
-  testAddSimpleOne : function() {
-    var t1 = this.Task.create({"topic" : "Topic1"});
-    this.u.addToTasks(t1);
-    assert.isEqual(1, this.u.getTasks().length);
-  },
-
-  testAddSimpleTwo : function() {
-    var t1 = this.Task.create({"topic" : "Topic1"});
-    var t2 = this.Task.create({"topic" : "Topic2"});
-    this.u.addToTasks([t1, t2]);
-    assert.isEqual(2, this.u.getTasks().length);
-  },
-  
-  testAddIds : function() {
-    var t1 = this.Task.create({"topic" : "Topic1"});
-    var t2 = this.Task.create({"topic" : "Topic2"});
-    this.u.addToTasks([t1.id(), t2.id()]);
-    assert.isEqual(2, this.u.getTasks().length);
-  },
-  
-  testAddNull : function() {
-    this.u.addToTasks(null);
-    assert.isEqual(0, this.u.getTasks().length);
-  },
-  
-  testAddExistingToNew : function() {
-    var u  = this.User.makeNew({"name" : "Heribert"});
-    var t1 = this.Task.create({"topic" : "Topic1"});
-    u.addToTasks(t1);
-    assert.isEqual(1, u.getTasks().length);    
-  },
-  
-  testAddNewToNew : function() {
-    // var u  = this.User.makeNew({"name" : "Heribert"});
-    // var t1 = this.Task.makeNew({"topic" : "Topic1"});
-    // u.addToTasks(t1);
-    // assert.isEqual(1, u.getTasks().length);        
-    // TODO Failed, brauche erst vernünftigen Cache für ungespeicherte Assoziationen
-  },
-  
-  testAddNewToExisting : function() {
-    // var t1 = this.Task.makeNew({"topic" : "Topic1"});
-    // this.u.addToTasks(t1);
-    // assert.isEqual(1, this.u.getTasks().length);        
-    // TODO Failed, brauche erst vernünftigen Cache für ungespeicherte Assoziationen
-  },
-  
-  testGetCombinesCacheAndDB : function() {
-    // TODO brauche erst vernünftigen Cache für ungespeicherte Assoziationen
-  },
-  
-  testSurvivesReload : function() {
-    var t1 = this.Task.create({"topic" : "Topic1"});
-    this.u.addToTasks(t1);
-    assert.isEqual(1, this.u.getTasks().length);
-    this.u.save();
-    this.u = this.User.find({});
-    assert.isEqual(1, this.u.getTasks().length);
-  },
-  
-  testRemoveExisting : function() {
-    var t1 = this.Task.create({"topic" : "Topic1"});
-    this.u.addToTasks(t1);
-    assert.isEqual(1, this.u.getTasks().length);
-    this.u.removeFromTasks(t1);
-  },
-  
-  testRemoveNew : function() {
-    // TODO brauche erst vernünftigen Cache für ungespeicherte Assoziationen
-  },
-};
 
 */
