@@ -5,8 +5,6 @@ TODO
   - Client-server persistence
   - Support nested structures
   - Associations
-  - Validations
-    - Implementation in ResourceController
 
 - Static Asset delivery
   - In Dispatcher check for
