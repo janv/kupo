@@ -13,13 +13,13 @@ var Common = exports.Common = {
     return idOrInstance.toString().match(/^[abcdef\d]+$/);
   },
   
-  isNewInstance : function(i, model) {
-    if (!model) model = CIP;
-    return (i instanceof model && i.state == 'new' );
+  isNewInstance : function(i, ip) {
+    if (!ip) ip = CIP;
+    return (i instanceof ip && i.state == 'new' );
   },
   
-  isInstance : function(i, model) {
-    if (!model) model = CIP;
-    return i instanceof model;
+  isInstance : function(i, ip) {
+    if (!ip) ip = CIP;
+    return i instanceof ip;
   }
 }
