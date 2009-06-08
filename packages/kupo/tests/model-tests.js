@@ -91,7 +91,7 @@ exports.testDefinition = {
     });
     var Task = Model.define('task', {
       associations : {
-        "user" : Associations.belongs_to(User)
+        "user" : Associations.belongsTo(User)
       }
     });
     var t = Task.makeNew();

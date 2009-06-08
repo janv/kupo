@@ -11,7 +11,7 @@ exports.testBelongsTo = {
     this.User = Model.define('user', {});
     this.Task = Model.define('task', {
       associations : {
-        "user" : Associations.belongs_to(this.User)
+        "user" : Associations.belongsTo(this.User)
       }
     });
     this.User.collection().drop();
@@ -99,12 +99,12 @@ exports.testHasMany = {
     this.Task = Model.define('task', {});
     this.User = Model.define('user', {
       associations : {
-        "tasks" : Associations.has_many(this.Task)
+        "tasks" : Associations.hasMany(this.Task)
       }
     });
     // Bolt on the dependency, this is handled by require()'s circular dependency
     // solver in production
-    Associations.belongs_to(this.User).apply(this.Task.instancePrototype, ['user']);
+    Associations.belongsTo(this.User).apply(this.Task.instancePrototype, ['user']);
     
     this.User.collection().drop();
     this.Task.collection().drop();
@@ -224,12 +224,12 @@ exports.testHasOne = {
     this.Task = Model.define('task', {});
     this.User = Model.define('user', {
       associations : {
-        "task" : Associations.has_one(this.Task)
+        "task" : Associations.hasOne(this.Task)
       }
     });
     // Bolt on the dependency, this is handled by require()'s circular dependency
     // solver in production
-    Associations.belongs_to(this.User).apply(this.Task.instancePrototype, ['user']);
+    Associations.belongsTo(this.User).apply(this.Task.instancePrototype, ['user']);
     
     this.User.collection().drop();
     this.Task.collection().drop();
@@ -335,7 +335,7 @@ exports.testBelongsToMany = {
     this.Task = Model.define('task', {});
     this.User = Model.define('user', {
       associations : {
-        "tasks" : Associations.belongs_to_many(this.Task)
+        "tasks" : Associations.belongsToMany(this.Task)
       }
     });
     this.User.collection().drop();

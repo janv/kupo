@@ -1,6 +1,6 @@
 var Associations = exports.Associations = {};
 
-Associations.has_one          = require('kupo/model/has_one'        ).has_one;
-Associations.has_many         = require('kupo/model/has_many'       ).has_many;
-Associations.belongs_to       = require('kupo/model/belongs_to'     ).belongs_to;
-Associations.belongs_to_many  = require('kupo/model/belongs_to_many').belongs_to_many;
+Associations.hasOne        = require('kupo/model/has_one'        ).hasOne;
+Associations.hasMany       = require('kupo/model/has_many'       ).hasMany;
+Associations.belongsTo     = require('kupo/model/belongs_to'     ).belongsTo;
+Associations.belongsToMany = require('kupo/model/belongs_to_many').belongsToMany;

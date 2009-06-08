@@ -7,7 +7,7 @@ var Support = require('kupo/support').Support;
  * function that gets called upon intitialization of the InstancePrototype and augments
  * it with accessors for the association.
  */
-exports.belongs_to = function(model, options) {
+exports.belongsTo = function(model, options) {
   var foreignKey = model.name + "_id"
   
   // this gets called in the context of the Instance Prototype, creating the

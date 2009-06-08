@@ -7,7 +7,7 @@ var Support = require('kupo/support').Support;
  * function that gets called upon intitialization of the InstancePrototype and augments
  * it with accessors for the association.
  */
-exports.has_many = function(model, options) {
+exports.hasMany = function(model, options) {
   // this gets called in the context of the Instance Prototype, creating the
   // accessor functions
   return function(assocName) {

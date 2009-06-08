@@ -1,6 +1,6 @@
 var Support = require('kupo/support').Support;
 
-exports.belongs_to_many = function(model, options) {
+exports.belongsToMany = function(model, options) {
   var foreignKeys = model.name + "_ids"
   
   // this gets called in the context of the Instance Prototype, creating the
