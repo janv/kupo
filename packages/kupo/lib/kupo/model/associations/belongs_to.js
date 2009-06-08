@@ -1,55 +1,86 @@
 var Support = require('kupo/support').Support;
+var Common  = require('./common').Common;
+
+
+var BelongsToProxy = function(instance, targetModel, assocName, options) {
+  var foreignKey = (options || {}).foreignKey || (assocName + '_id');
+  this.cache = null;
+  this.beforeSaveCallbacks = [];
+  
+  this.set = function(idOrInstance){
+    if (Common.isPlainKey(idOrInstance)) {
+      instance.set(foreignKey, idOrInstance);      
+    } else if (Common.isNewInstance(idOrInstance, targetModel.instancePrototype)) {
+      this.beforeSaveCallbacks.push(function(){
+        idOrInstance.save();
+        instance.set(foreignKey, idOrInstance.id());
+        //TODO Fehlerbehandlung
+      });
+      this.cache = idOrInstance;
+      instance.taint()
+    } else if (Common.isInstance(idOrInstance, targetModel.instancePrototype)) {
+      instance.set(foreignKey, idOrInstance.id());     
+    }
+  };
+  
+  this.get = function(skipCache){
+    if (!this.cache || (skipCache == true)) {
+      if (instance.get(foreignKey) == null) return null;
+      this.cache = targetModel.find(instance.get(foreignKey));
+    }
+    return this.cache;
+  };
+  
+  this.remove  = function(){
+    instance.erase(foreignKey);
+    this.cache = null;
+  };
+  
+  this.makeNew = function(p){
+    var t = targetModel.makeNew(p);
+    this.set(t);
+    return t;
+  };
+  
+  this.create = function(p){
+    var t = targetModel.create(p);
+    this.set(t);
+    return t;
+  };
+  
+  this.beforeSave = function(){
+    for (var i=0; i < this.beforeSaveCallbacks.length; i++) {
+      this.beforeSaveCallbacks[i]();
+    };
+    this.beforeSaveCallbacks = [];
+  }
+}
+
 
 /**
- * Creates a belongs-to association to be stored in the specialization.associations
- * under the associations name.
- * Pass the model you want to associate with. Actually returns a initialization
- * function that gets called upon intitialization of the InstancePrototype and augments
- * it with accessors for the association.
+ * Returns the association object that gets stored in the CommonInstanceProtoype
+ *
+ * The AssociationObject has 2 Functions:
+ * - installProxy gets called in the constructor of a new instance,
+ *   gets the instance and the associationName as a Parameter and installs the
+ *   proxy in the instance;
+ * - registerCallbacks gets called when the instancePrototype is created.
+ *   it registers the associations callbacks in the instancePrototype.
+ *   These callbacks can read the data of the AssociationProxy through the
+ *   instance which contains the Proxy.
+ *
+ *  TODO: Put this text in model.js
  */
-exports.belongsTo = function(model, options) {
-  var foreignKey = model.name + "_id"
-  
-  // this gets called in the context of the Instance Prototype, creating the
-  // accessor functions
-  return function(assocName) {
-    //create set Function
-    /**
-     * Sets the association to an object or an id.
-     * Pass in null to remove the association.
-     */
-    this['set' + Support.capitalize(assocName)] = function(idOrInstance) {
-      if (idOrInstance == null) {
-        this.erase(foreignKey);
-        delete(this.associationCache[assocName]);
-      } else if (idOrInstance.toString().match(/^[abcdef\d]+$/)) {
-        this.set(foreignKey, idOrInstance.toString());
-      } else {
-        if (idOrInstance.state != 'removed') {
-          this.set(foreignKey, idOrInstance.get('_id'));
-          this.associationCache[assocName] = idOrInstance;
-        }
-      }
-    }
+exports.belongsTo = function(targetModel, options) {
+  return {
+    installProxy : function(instance, assocName) {
+      instance[assocName] = new BelongsToProxy(instance, targetModel, assocName, options);
+    },
     
-    //create get Function
-    /**
-     * Returns the instance referenced by the association.
-     */
-    this['get' + Support.capitalize(assocName)] = function(skipCache) {
-      if (!this.associationCache[assocName] || (skipCache == true)) {
-        if (this.get(foreignKey) == null) return null;
-        this.associationCache[assocName] = model.find(this.get(foreignKey));
-      }
-      return this.associationCache[assocName];
+    registerCallbacks : function(instancePrototype, assocName) {
+      instancePrototype.model.installCallback('beforeSave', function(){
+        this[assocName].beforeSave();
+      })
     }
-    
-    //install save callback
-    var callback = function() {
-      var assoc = this['get' + Support.capitalize(assocName)]();
-      if (assoc) assoc.save();
-    }
-    
-    this.model.installCallback('beforeSave', callback);
   }
 }

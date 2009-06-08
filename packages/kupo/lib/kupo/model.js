@@ -179,8 +179,7 @@ ClassPrototype.create = function(data) {
  *
  * @class
  */
-var CommonInstancePrototype = {
-  "associationCache" : {},
+var CommonInstancePrototype = exports.CommonInstancePrototype = {
   "defaultCallables" : ['update'],
   "errors" : [],
   "state" : 'new' // new, clean, dirty, removed
@@ -198,16 +197,24 @@ CommonInstancePrototype.derive = function(_instanceSpec, _model){
   var ip = Support.clone(CommonInstancePrototype);
   ip.instanceSpec = _instanceSpec;
   ip.model = _model;
-  ip.installAssociations();
+  ip.registerAssociationCallbacks()
   if (ip.instanceSpec) ip.extractMethods(ip.instanceSpec.methods);
   return ip;
 }
 
 // Call only on Instance Prototype, otherwise the assocs are installed on the 
 // Common Instance prototype
-CommonInstancePrototype.installAssociations = function() {
+CommonInstancePrototype.registerAssociationCallbacks = function() {
   for (var a in this.model.specialization.associations) {
-    this.model.specialization.associations[a].apply(this, [a]);
+    this.model.specialization.associations[a].registerCallbacks(this, a);
+  }
+}
+
+// Call only on Instance Prototype, otherwise the assocs are installed on the 
+// Common Instance prototype
+CommonInstancePrototype.installAssociationProxies = function() {
+  for (var a in this.model.specialization.associations) {
+    this.model.specialization.associations[a].installProxy(this, a);
   }
 }
 
@@ -414,6 +421,6 @@ var newInstance = function(_instancePrototype, _data, _state) {
   //TODO: New nur ohne id
   instance.state = _state || 'new';
   instance.errors = [];
-  instance.associationCache = {};
+  instance.installAssociationProxies();
   return instance;
 }

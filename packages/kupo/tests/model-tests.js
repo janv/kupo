@@ -103,6 +103,11 @@ exports.testDefinition = {
     var p = Project.create({a:1});
     p = Project.all({})[0];
     assert.isEqual(1, p.get('a'));
+  },
+  
+  testModelRecognition : function() {
+    var p = Project.create({a:1});
+    assert.isTrue(p instanceof Project.instancePrototype);
   }
 }
 

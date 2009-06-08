@@ -21,67 +21,104 @@ exports.testBelongsTo = {
   
   testSetSaved : function() {
     var t = this.Task.makeNew({'topic': 'Whatever'});
-    t.setUser(this.u);
-    assert.isEqual(this.u.get('_id'), t.get('user_id'));
+    t.user.set(this.u);
+    assert.isEqual(this.u.id(), t.get('user_id'));
     assert.isTrue(t.save())
-    assert.isEqual("Hans Wurst", t.getUser().get('name'));
+    assert.isEqual("Hans Wurst", t.user.get().get('name'));
   },
-  
+
   testSetInvalidId : function() {
     this.u.remove();
     var t = this.Task.makeNew({'topic': 'Whatever'});
     
-    t.setUser(this.u.get('_id'));
-    assert.isTrue(null == t.getUser());
+    t.user.set(this.u.id());
+    assert.isTrue(null == t.user.get());
   },
   
   testSetRemoved : function() {
     this.u.remove();
     var t = this.Task.makeNew({'topic': 'Whatever'});
     
-    t.setUser(this.u);
-    assert.isTrue(null == t.getUser());
+    t.user.set(this.u);
+    assert.isTrue(null == t.user.get());
   },
   
-  testSetUnsaved : function() {
-    //auf ungespeichertes Objekt setzen
+  testSetNewToNew : function() {
     var u = this.User.makeNew({'name': 'Gerda'});
     var t = this.Task.makeNew({'topic': 'Whatever'});
     
-    t.setUser(u);
-    assert.isEqual(u, t.getUser());
+    t.user.set(u);
+    assert.isEqual(u, t.user.get());
     assert.isTrue(t.save());
     assert.isEqual('clean', u.state);
   },
   
+  testSetNewtoExisting : function() {
+    var u = this.User.makeNew({'name': 'Gerda'});
+    var t = this.Task.create({'topic': 'Whatever'});
+    
+    t.user.set(u);
+    assert.isEqual(u, t.user.get());
+    assert.isTrue(t.save());
+    assert.isEqual('clean', u.state);
+  },
+
+  testSetExistingToNew : function() {
+    var u = this.User.create({'name': 'Gerda'});
+    var t = this.Task.makeNew({'topic': 'Whatever'});
+    
+    t.user.set(u);
+    assert.isEqual(u.id(), t.user.get().id());
+    assert.isTrue(t.save());
+    assert.isEqual('clean', u.state);
+  },
+
   testReset : function() {
     var t = this.Task.makeNew({'topic': 'Whatever'});
-    t.setUser(this.u);
+    t.user.set(this.u);
     t.save();
     var u = this.User.makeNew({'name': 'Gerda'});
     
-    t.setUser(u);
-    assert.isTrue(t.save());    
-    assert.isEqual('clean', u.state);
-    assert.isEqual(u, t.getUser());
+    t.user.set(u);
+    assert.isEqual('new', u.state, "User new after setting as task.user");
+    assert.isEqual('dirty', t.state, "Task dirty after setting user as task.user");
+    assert.isTrue(t.save(), "Task saves");  
+    assert.isEqual('clean', u.state, "User clean");
+    assert.isEqual(u, t.user.get(), "User is user");
   },
   
   testSetNull : function() {
     var t = this.Task.makeNew({'topic': 'Whatever'});
-    t.setUser(null);
+    t.user.set(null);
 
     assert.isTrue(t.save());    
-    assert.isTrue(null == t.getUser());
+    assert.isTrue(null == t.user.get());
     assert.isTrue(!t.data.hasOwnProperty('user_id'));
   },
   
+  testCreate : function() {
+    var t = this.Task.makeNew({'topic' : "Whatever"});
+    t.user.create({"name" : "Gerda"});
+    assert.isEqual(2, this.User.collection().count());
+    assert.isEqual("Gerda", t.user.get().get('name'));
+    assert.isEqual("clean", t.user.get().state);
+  },
+  
+  testMakeNew : function() {
+    var t = this.Task.makeNew({'topic' : "Whatever"});
+    t.user.makeNew({"name" : "Gerda"});
+    assert.isEqual(1, this.User.collection().count());
+    assert.isEqual("Gerda", t.user.get().get('name'));
+    assert.isEqual("new", t.user.get().state);
+  },
+      
   testSurvivesReload : function() {
     var t = this.Task.makeNew({'topic': 'Whatever'});
-    t.setUser(this.u);
+    t.user.set(this.u);
     t.save();
     
     t = this.Task.find({});
-    assert.isEqual("Hans Wurst", t.getUser().get('name'));    
+    assert.isEqual("Hans Wurst", t.user.get().get('name'));    
   },
   
   testDisallowWrongModels : function() {
@@ -91,8 +128,10 @@ exports.testBelongsTo = {
   testSkipCache : function() {
     //TODO Implement
   }
-    
+  */  
 }
+
+/*
 
 exports.testHasMany = {
   setup : function() {
@@ -420,7 +459,6 @@ exports.testBelongsToMany = {
   testRemoveNew : function() {
     // TODO brauche erst vernünftigen Cache für ungespeicherte Assoziationen
   },
-  
-
 };
 
+*/
