@@ -2,6 +2,8 @@ var jsDump = require('test/jsdump').jsDump;
 var assert = require("test/assert");
 require("kupo/mongo_adapter").MongoAdapter.setConnection("kupo_test");
 var Model  = require("kupo/model").Model;
+var Associations = require("kupo/model/associations").Associations;
+var Validations  = require("kupo/model/validations").Validations;
 
 // Sample Model //////////////////////////////////////////////////////////////
 
@@ -89,7 +91,7 @@ exports.testDefinition = {
     });
     var Task = Model.define('task', {
       associations : {
-        "user" : Model.belongs_to(User)
+        "user" : Associations.belongs_to(User)
       }
     });
     var t = Task.makeNew();
@@ -447,7 +449,7 @@ exports.testValidations = {
   },
 
   testNumericality : function() {
-    this.validations.push(Model.validatesNumericalityOf('b'));
+    this.validations.push(Validations.validatesNumericalityOf('b'));
     this.foop.set('b', 2);
     assert.isTrue(this.foop.save());
     assert.isEqual('clean', this.foop.state);
