@@ -240,7 +240,112 @@ exports.testBelongsToMany = {
   }
 };
 
+exports.testHasOne = {
+  setup : function() {
+    this.Task = Model.define('task', {});
+    this.User = Model.define('user', {
+      associations : {
+        "task" : Associations.hasOne(this.Task)
+      }
+    });
+    
+    this.User.collection().drop();
+    this.Task.collection().drop();
+    this.u = this.User.create({'name': "Hans Wurst"});
+  },
+  
+  testFindSimple : function() {
+    var t = this.Task.makeNew({'topic': 'Whatever'});
+    t.set('user_id', this.u.id());
+    t.save();
+    assert.isEqual('Whatever', this.u.task.get().get('topic'));
+  },
+  
+  testSetExistingToExisting : function() {
+    var t = this.Task.create({'topic': 'Whatever'});
+    this.u.task.set(t);
+    assert.isEqual('clean', this.u.state, "user clean");
+    assert.isEqual('clean', t.state, "task clean");
+    assert.isEqual(this.u.id(), t.get('user_id'));
+    assert.isTrue(null != this.u.task.get(), "User.task.get() not null");
+    assert.isEqual(this.u.id(), this.u.task.get().get('user_id'));
+  },
+  
+  testSetNewToExisting : function() {
+    var t = this.Task.makeNew({'topic': 'Whatever'});
+    this.u.task.set(t);
+    assert.isEqual('clean', t.state);
+    assert.isEqual('clean', this.u.state);
+    assert.isEqual(this.u.id(), t.get('user_id'));
+    assert.isEqual(this.u.id(), this.u.task.get().get('user_id'));
+    this.u.save();
+    assert.isEqual('clean', t.state);
+    assert.isEqual('clean', this.u.state);
+  },
+  
+  testSetNewtoNew : function() {
+    var u = this.User.makeNew({'name': 'Hans'});
+    var t = this.Task.makeNew({'topic': 'Whatever'});
+    u.task.set(t);
+    assert.isEqual('new', u.state, "User is new");
+    assert.isEqual('new', t.state, "Task is new");
+    u.save()
+    assert.isEqual('clean', u.state, "User is clean after saving");
+    assert.isEqual('clean', t.state, "Task is clean after saving user");
+    assert.isEqual(u.id(), t.get('user_id'), "Task.user_id matches user._id");
+    assert.isEqual(u.id(), u.task.get().get('user_id'), "Task(from u.getTasks).user_id matches user._id");
+  },
+  
+  testAddExistingToNew : function() {
+    var u = this.User.makeNew({'name': 'Hans'});
+    assert.isEqual(null, u.task.get(), "GetTask returning null before creating a task");
+    var t = this.Task.create({'topic': 'Whatever'});
+    assert.isEqual(null, u.task.get(), "GetTask returning null after creating a task");
+    u.task.set(t);
+    assert.isEqual('new', u.state, "User is still new after adding Task");
+    assert.isEqual('clean', t.state, "Task is still clean after being added to user");
+    assert.isTrue(null != u.task.get(), "GetTask returns task before saving");
+    u.save()
+    assert.isEqual('clean', u.state, "User is clean after saving");
+    assert.isEqual('clean', t.state, "Task is clean after saving user");
+    assert.isTrue(null != u.task.get(), "GetTask returns task after saving");
+    assert.isEqual(u.id(), u.task.get().get('user_id'), "Task(from u.getTasks).user_id matches user._id");
+  },
+  
+  testRemoveExisting : function() {
+    var t = this.Task.create({'topic': 'Whatever'});
+    this.u.task.set(t);
+    this.u.save();
+    assert.isEqual(this.u.id(), this.u.task.get().get('user_id'), "Task(from u.getTasks).user_id matches user._id");
+    assert.isTrue(null != this.u.task.get(), "GetTask returns task after saving");
+    this.u.task.remove();
+    assert.isTrue(undefined == t.get('user_id'), "user_id removed from task");
+    assert.isTrue(null == this.u.task.get(), "GetTask returns null after removing");
+    assert.isEqual('clean', t.state);
+  },
+  
+  testRemoveNew : function() {
+    var t = this.Task.makeNew({'topic': 'Whatever'});
+    this.u.task.set(t);
+    assert.isEqual(this.u.id(), this.u.task.get().get('user_id'), "Task(from u.getTasks).user_id matches user._id");
+    assert.isTrue(null != this.u.task.get(), "GetTask returns task after saving");
+    this.u.task.remove();
+    assert.isTrue(undefined == t.get('user_id'), "user_id removed from task");
+    assert.isTrue(null == this.u.task.get(), "GetTask returns null after removing");
+    assert.isEqual('clean', t.state);
+  },
+  
+  testSetNull : function() {
+    this.u.task.set(null);
+    assert.isEqual('clean', this.u.state);
+    assert.isEqual(null, this.u.task.get());
+    this.u.save();
+    assert.isEqual('clean', this.u.state);
+  }
+}
+
 /*
+
 
 exports.testHasMany = {
   setup : function() {
@@ -274,8 +379,8 @@ exports.testHasMany = {
     var t = this.Task.create({'topic': 'Whatever'});
     this.u.addToTasks(t);
     assert.isEqual('dirty', this.u.state);
-    assert.isEqual(this.u.get('_id'), t.get('user_id'));
-    assert.isEqual(this.u.get('_id'), this.u.getTasks()[0].get('user_id'));
+    assert.isEqual(this.u.id(), t.get('user_id'));
+    assert.isEqual(this.u.id(), this.u.getTasks()[0].get('user_id'));
   },
   
   testAddNew : function() {
@@ -283,8 +388,8 @@ exports.testHasMany = {
     this.u.addToTasks(t);
     assert.isEqual('new', t.state);
     assert.isEqual('dirty', this.u.state);
-    assert.isEqual(this.u.get('_id'), t.get('user_id'));
-    assert.isEqual(this.u.get('_id'), this.u.getTasks()[0].get('user_id'));
+    assert.isEqual(this.u.id(), t.get('user_id'));
+    assert.isEqual(this.u.id(), this.u.getTasks()[0].get('user_id'));
   },
   
   testAddNewtoNew : function() {
@@ -296,8 +401,8 @@ exports.testHasMany = {
     u.save()
     assert.isEqual('clean', u.state, "User is clean after saving");
     assert.isEqual('clean', t.state, "Task is clean after saving user");
-    assert.isEqual(u.get('_id'), t.get('user_id'), "Task.user_id matches user._id");
-    assert.isEqual(u.get('_id'), u.getTasks()[0].get('user_id'), "Task(from u.getTasks).user_id matches user._id");
+    assert.isEqual(u.id(), t.get('user_id'), "Task.user_id matches user._id");
+    assert.isEqual(u.id(), u.getTasks()[0].get('user_id'), "Task(from u.getTasks).user_id matches user._id");
   },
   
   testAddExistingToNew : function() {
@@ -313,14 +418,14 @@ exports.testHasMany = {
     assert.isEqual('clean', u.state, "User is clean after saving");
     assert.isEqual('clean', t.state, "Task is clean after saving user");
     assert.isEqual(1, u.getTasks().length, "GetTasks returns one task after saving");
-    assert.isEqual(u.get('_id'), u.getTasks()[0].get('user_id'), "Task(from u.getTasks).user_id matches user._id");
+    assert.isEqual(u.id(), u.getTasks()[0].get('user_id'), "Task(from u.getTasks).user_id matches user._id");
   },
   
   testRemoveExisting : function() {
     var t = this.Task.create({'topic': 'Whatever'});
     this.u.addToTasks(t);
     this.u.save();
-    assert.isEqual(this.u.get('_id'), this.u.getTasks()[0].get('user_id'), "Task(from u.getTasks).user_id matches user._id");
+    assert.isEqual(this.u.id(), this.u.getTasks()[0].get('user_id'), "Task(from u.getTasks).user_id matches user._id");
     assert.isEqual(1, this.u.getTasks().length);
     this.u.removeFromTasks(t);
     assert.isTrue(null == t.get('user_id'));
@@ -330,7 +435,7 @@ exports.testHasMany = {
   testRemoveNew : function() {
     var t = this.Task.makeNew({'topic': 'Whatever'});
     this.u.addToTasks(t);
-    assert.isEqual(this.u.get('_id'), this.u.getTasks()[0].get('user_id'), "Task(from u.getTasks).user_id matches user._id");
+    assert.isEqual(this.u.id(), this.u.getTasks()[0].get('user_id'), "Task(from u.getTasks).user_id matches user._id");
     assert.isEqual(1, this.u.getTasks().length);
     this.u.removeFromTasks(t);
     assert.isEqual(0, this.u.getTasks().length);
@@ -350,8 +455,8 @@ exports.testHasMany = {
     var t1 = this.Task.create({'topic': 'Topic1'});
     var t2 = this.Task.create({'topic': 'Topic2'});
     this.u.addToTasks([t1, t2]);
-    assert.isEqual(this.u.get('_id'), t1.get('user_id'), "Task 1.user_id matches user._id");
-    assert.isEqual(this.u.get('_id'), t2.get('user_id'), "Task 2.user_id matches user._id");
+    assert.isEqual(this.u.id(), t1.get('user_id'), "Task 1.user_id matches user._id");
+    assert.isEqual(this.u.id(), t2.get('user_id'), "Task 2.user_id matches user._id");
     assert.isEqual('dirty', this.u.state);
     assert.isEqual('dirty', t1.state);
     assert.isEqual('dirty', t2.state);
@@ -365,117 +470,6 @@ exports.testHasMany = {
     assert.isEqual('Topic2', tasks[1].get('topic'));
   }
   
-}
-
-exports.testHasOne = {
-  setup : function() {
-    this.Task = Model.define('task', {});
-    this.User = Model.define('user', {
-      associations : {
-        "task" : Associations.hasOne(this.Task)
-      }
-    });
-    // Bolt on the dependency, this is handled by require()'s circular dependency
-    // solver in production
-    Associations.belongsTo(this.User).apply(this.Task.instancePrototype, ['user']);
-    
-    this.User.collection().drop();
-    this.Task.collection().drop();
-    this.u = this.User.create({'name': "Hans Wurst"});
-  },
-  
-  testFindSimple : function() {
-    var t = this.Task.makeNew({'topic': 'Whatever'});
-    t.setUser(this.u);
-    t.save();
-    t = this.u.getTask();
-    assert.isEqual('Whatever', t.get('topic'));
-  },
-  
-  testAddExisting : function() {
-    var t = this.Task.create({'topic': 'Whatever'});
-    this.u.setTask(t);
-    assert.isEqual('dirty', this.u.state);
-    assert.isEqual('dirty', t.state);
-    assert.isEqual(this.u.get('_id'), t.get('user_id'));
-    assert.isTrue(null != this.u.getTask(), "User.getTask not null");
-    this.u.save();
-    assert.isEqual('clean', this.u.state, "User clean after save");
-    assert.isEqual('clean', t.state, "Task clean after save");
-    assert.isEqual(this.u.get('_id'), this.u.getTask().get('user_id'));
-  },
-  
-  testAddNew : function() {
-    var t = this.Task.makeNew({'topic': 'Whatever'});
-    this.u.setTask(t);
-    assert.isEqual('new', t.state);
-    assert.isEqual('dirty', this.u.state);
-    assert.isEqual(this.u.get('_id'), t.get('user_id'));
-    assert.isEqual(this.u.get('_id'), this.u.getTask().get('user_id'));
-    this.u.save();
-    assert.isEqual('clean', t.state);
-    assert.isEqual('clean', this.u.state);
-  },
-  
-  testAddNewtoNew : function() {
-    var u = this.User.makeNew({'name': 'Hans'});
-    var t = this.Task.makeNew({'topic': 'Whatever'});
-    u.setTask(t);
-    assert.isEqual('new', u.state, "User is new");
-    assert.isEqual('new', t.state, "Task is new");
-    u.save()
-    assert.isEqual('clean', u.state, "User is clean after saving");
-    assert.isEqual('clean', t.state, "Task is clean after saving user");
-    assert.isEqual(u.get('_id'), t.get('user_id'), "Task.user_id matches user._id");
-    assert.isEqual(u.get('_id'), u.getTask().get('user_id'), "Task(from u.getTasks).user_id matches user._id");
-  },
-  
-  testAddExistingToNew : function() {
-    var u = this.User.makeNew({'name': 'Hans'});
-    assert.isEqual(null, u.getTask(), "GetTask returning null before creating a task");
-    var t = this.Task.create({'topic': 'Whatever'});
-    assert.isEqual(null, u.getTask(), "GetTask returning null after creating a task");
-    u.setTask(t);
-    assert.isEqual('new', u.state, "User is still new after adding Task");
-    assert.isEqual('clean', t.state, "Task is still clean after being added to user");
-    assert.isTrue(null != u.getTask(), "GetTask returns task before saving");
-    u.save()
-    assert.isEqual('clean', u.state, "User is clean after saving");
-    assert.isEqual('clean', t.state, "Task is clean after saving user");
-    assert.isTrue(null != u.getTask(), "GetTask returns task after saving");
-    assert.isEqual(u.get('_id'), u.getTask().get('user_id'), "Task(from u.getTasks).user_id matches user._id");
-  },
-  
-  testRemoveExisting : function() {
-    var t = this.Task.create({'topic': 'Whatever'});
-    this.u.setTask(t);
-    this.u.save();
-    assert.isEqual(this.u.get('_id'), this.u.getTask().get('user_id'), "Task(from u.getTasks).user_id matches user._id");
-    assert.isTrue(null != this.u.getTask(), "GetTask returns task after saving");
-    this.u.removeTask();
-    assert.isTrue(undefined == t.get('user_id'), "user_id removed from task");
-    assert.isTrue(null == this.u.getTask(), "GetTask returns null after removing");
-    assert.isEqual('clean', t.state);
-  },
-  
-  testRemoveNew : function() {
-    var t = this.Task.makeNew({'topic': 'Whatever'});
-    this.u.setTask(t);
-    assert.isEqual(this.u.get('_id'), this.u.getTask().get('user_id'), "Task(from u.getTasks).user_id matches user._id");
-    assert.isTrue(null != this.u.getTask(), "GetTask returns task after saving");
-    this.u.removeTask();
-    assert.isTrue(undefined == t.get('user_id'), "user_id removed from task");
-    assert.isTrue(null == this.u.getTask(), "GetTask returns null after removing");
-    assert.isEqual('clean', t.state);
-  },
-  
-  testSetNull : function() {
-    this.u.setTask(null);
-    assert.isEqual('clean', this.u.state);
-    assert.isEqual(null, this.u.getTask());
-    this.u.save();
-    assert.isEqual('clean', this.u.state);
-  }
 }
 
 */
