@@ -442,5 +442,19 @@ exports.testValidations = {
     assert.isEqual(2, order[1]);
   },
   
-  testErrors : function() {}
+  testErrors : function() {
+    //TODO implement
+  },
+
+  testNumericality : function() {
+    this.validations.push(Model.validatesNumericalityOf('b'));
+    this.foop.set('b', 2);
+    assert.isTrue(this.foop.save());
+    assert.isEqual('clean', this.foop.state);
+    this.foop.set('b', 'xxx');
+    assert.isTrue(!this.foop.save());
+    assert.isEqual('dirty', this.foop.state);
+    assert.isEqual("b", this.foop.errors[0][0]);
+    assert.isEqual("is not a number", this.foop.errors[0][1]);
+  }
 }
