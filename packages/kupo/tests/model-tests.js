@@ -95,8 +95,8 @@ exports.testDefinition = {
       }
     });
     var t = Task.makeNew();
-    assert.isEqual('function', typeof t.setUser);
-    assert.isEqual('function', typeof t.getUser);
+    assert.isEqual('function', typeof t.user.set);
+    assert.isEqual('function', typeof t.user.get);
   },
   
   testAllDerivesFromInstancePrototype : function() {
