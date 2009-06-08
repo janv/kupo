@@ -31,9 +31,9 @@ var BelongsToManyProxy = function(instance, targetModel, assocName, options) {
       var o = objects[i];
       if (Common.isPlainKey(o)) {
         this.newIds.push(o);
-      } else if (Common.isNewInstance(o, targetModel.instancePrototype)) {
+      } else if (Common.isNewInstance(o, targetModel)) {
         this.newInstances.push(o);
-      } else if (Common.isInstance(o, targetModel.instancePrototype)) {
+      } else if (Common.isInstance(o, targetModel)) {
         this.newIds.push(o.id());
       }
     };
@@ -52,7 +52,7 @@ var BelongsToManyProxy = function(instance, targetModel, assocName, options) {
   
   this.removeSingle = function(idOrInstance) {
     this.cache = null;
-    if (Common.isNewInstance(idOrInstance, targetModel.instancePrototype)) {
+    if (Common.isNewInstance(idOrInstance, targetModel)) {
       for (var i = this.newInstances.length - 1; i >= 0; i--){
         if (this.newInstances[i] == idOrInstance) this.newInstances.splice(i, 1);
       };

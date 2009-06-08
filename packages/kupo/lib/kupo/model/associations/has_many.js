@@ -22,7 +22,7 @@ var HasManyProxy = function(instance, targetModel, assocName, options) {
       if (Common.isPlainKey(o)) {
         var other = targetModel.find(searchRef(o));
         if (other == null) return;
-      } else if (Common.isInstance(o, targetModel.instancePrototype)) {
+      } else if (Common.isInstance(o, targetModel)) {
         var other = o;
       } else {
         continue;
@@ -54,7 +54,7 @@ var HasManyProxy = function(instance, targetModel, assocName, options) {
     this.cache = null;
     if (Common.isPlainKey(idOrInstance)) {
       var old = targetModel.find(idOrInstance);
-    } else if (Common.isInstance(idOrInstance, targetModel.instancePrototype)) {
+    } else if (Common.isInstance(idOrInstance, targetModel)) {
       var old = idOrInstance;
     } else {
       return;

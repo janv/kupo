@@ -17,7 +17,7 @@ var HasOneProxy = function(instance, targetModel, assocName, options) {
     if (Common.isPlainKey(idOrInstance)) {
       var other = targetModel.find(searchRef(idOrInstance));
       if (other == null) return;
-    } else if (Common.isInstance(idOrInstance, targetModel.instancePrototype)) {
+    } else if (Common.isInstance(idOrInstance, targetModel)) {
       var other = idOrInstance;
     } else {
       return;

@@ -10,7 +10,7 @@ var BelongsToProxy = function(instance, targetModel, assocName, options) {
   this.set = function(idOrInstance){
     if (Common.isPlainKey(idOrInstance)) {
       instance.set(foreignKey, idOrInstance);      
-    } else if (Common.isNewInstance(idOrInstance, targetModel.instancePrototype)) {
+    } else if (Common.isNewInstance(idOrInstance, targetModel)) {
       this.beforeSaveCallbacks.push(function(){
         idOrInstance.save();
         instance.set(foreignKey, idOrInstance.id());
@@ -18,7 +18,7 @@ var BelongsToProxy = function(instance, targetModel, assocName, options) {
       });
       this.cache = idOrInstance;
       instance.taint()
-    } else if (Common.isInstance(idOrInstance, targetModel.instancePrototype)) {
+    } else if (Common.isInstance(idOrInstance, targetModel)) {
       instance.set(foreignKey, idOrInstance.id());     
     }
   };
