@@ -1,19 +1,48 @@
 var Support = require('kupo/support').Support;
 var Common  = require('./common').Common;
 
+/**
+ * Proxy for a HasMany association
+ *
+ * This constructor creates a HasMany association proxy that can be attached to
+ * a model instance.
+ *
+ * The HasMany association is a directed n-1 association from a model A to a model B with
+ * the foreign keys being stored in the instances of model B.
+ *
+ * When you assign an object to a HasMany association, that object is automatically
+ * saved (in order to update its foreign key). If you assign multiple objects in one statement,
+ * then they are all saved.
+ *
+ * If the parent object (the one declaring the HasMany association) is unsaved
+ * (state == new and doesn't have an id) then the child objects are not saved
+ * when they are added. All unsaved members of the association will automatically
+ * be saved when the parent is saved.
+ *
+ * @constructor
+ * @param instance    The model instance this proxy operates on
+ * @param targetModel The target model class of the association
+ * @param assocName   The associations name
+ * @param options     An object containing various options, currently only `foreignKey`
+ */
 var HasManyProxy = function(instance, targetModel, assocName, options) {
-  // Eigentlich so, statt instance.model.name aber lookup im belongs to
+  // Should be a lookup in the matching belongsTo association, Too complicated
   var foreignKey = (options || {}).foreignKey || (instance.model.name + '_id');
   this.cache = null;
   this.newInstances = [];
   this.callbacks = [];
   
+  /** Helper that generates a reference object to perform searches for associated objects */
   function searchRef(id) {
     var ref = {};
     ref[foreignKey] = id || instance.id();
     return ref;
   };
   
+  /**
+   * Adds objects to this association. Pass model instances or just IDs.
+   * You can pass arrays or single instances
+   */  
   this.add = function(objects) {
     if (!(objects instanceof Array)) objects = [objects];
     this.cache = null;
@@ -36,12 +65,16 @@ var HasManyProxy = function(instance, targetModel, assocName, options) {
         this.callbacks.push(function() {
           other.set(foreignKey, instance.id());
           other.save();
-        })
+        }); //TODO mark the function with the instance, so removing removes both
       }
     };
     this.cache = null;
   };
   
+  /**
+   * Retrieves the objects in this association.
+   * Pass true to skip the cache and retrieve the objects directly from the database
+   */
   this.get = function(skipCache){
     if (!this.cache || (skipCache == true)) {
       this.cache = instance.id() != null ? targetModel.all(searchRef()) : [];
@@ -50,6 +83,10 @@ var HasManyProxy = function(instance, targetModel, assocName, options) {
     return this.cache;
   };
   
+  /**
+   * Removes a single object from this association.
+   * Pass a model instance or just an ID.
+   */
   this.removeSingle = function(idOrInstance) {
     this.cache = null;
     if (Common.isPlainKey(idOrInstance)) {
@@ -64,8 +101,14 @@ var HasManyProxy = function(instance, targetModel, assocName, options) {
       old.erase(foreignKey);
       old.save();
     }
+    //TODO remove from newInstances aswell
   }
   
+  /**
+   * Removes several objects from this association.
+   * Pass model instances or just IDs.
+   * You can pass arrays or single instances
+   */
   this.remove = function(objects){
     this.cache = null;
     if (!(objects instanceof Array)) objects = [objects];
@@ -74,18 +117,25 @@ var HasManyProxy = function(instance, targetModel, assocName, options) {
     };
   };
   
+  /**
+   * Make a new instance and add it to the association
+   */
   this.makeNew = function(p){
     var t = targetModel.makeNew(p);
     this.add(t);
     return t;
   };
   
+  /**
+   * Create an instance and add it to the association
+   */
   this.create = function(p){
     var t = targetModel.create(p);
     this.add(t);
     return t;
   };
   
+  /** @private */
   this.afterSave = function(){    
     if (this.callbacks.length > 0) {
       for (var i=0; i < this.callbacks.length; i++) {
@@ -98,18 +148,7 @@ var HasManyProxy = function(instance, targetModel, assocName, options) {
 
 
 /**
- * Returns the association object that gets stored in the CommonInstanceProtoype
- *
- * The AssociationObject has 2 Functions:
- * - installProxy gets called in the constructor of a new instance,
- *   gets the instance and the associationName as a Parameter and installs the
- *   proxy in the instance;
- * - registerCallbacks gets called when the instancePrototype is created.
- *   it registers the associations callbacks in the instancePrototype.
- *   These callbacks can read the data of the AssociationProxy through the
- *   instance which contains the Proxy.
- *
- *  TODO: Put this text in model.js
+ * This function generates an association definition for this type of association
  */
 exports.hasMany = function(targetModel, options) {
   return {
@@ -124,102 +163,3 @@ exports.hasMany = function(targetModel, options) {
     }
   }
 }
-
-
-
-
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-// var Support = require('kupo/support').Support;
-// 
-// /**
-//  * Creates a belongs-to association to be stored in the specialization.associations
-//  * under the associations name.
-//  * Pass the model you want to associate with. Actually returns a initialization
-//  * function that gets called upon intitialization of the InstancePrototype and augments
-//  * it with accessors for the association.
-//  */
-// exports.hasMany = function(model, options) {
-//   // this gets called in the context of the Instance Prototype, creating the
-//   // accessor functions
-//   return function(assocName) {
-//     var ownKey = this.model.name + "_id"
-// 
-//     this.unsavedHasManyAssociations = [];
-//     this.unsavedHasManyCallbacks    = [];
-//     
-//     //create get Function
-//     this['get' + Support.capitalize(assocName) ] = function() {
-//       if (this.get('_id') != null) {
-//         var ref = {};
-//         ref[ownKey] = this.get('_id');
-//         var dbobjects = model.all(ref);
-//       } else {
-//         var dbobjects = [];
-//       }
-//       var arr = this.unsavedHasManyAssociations.concat(dbobjects);
-//       return arr;
-//     }
-//     
-//     // Working with these Callback generators to prevent a weird scoping bug
-//     // where changes in o in the loop would affect previously created callbacks
-//     function setCallback(ownKey, ob) {
-//       return function(host){ob.set(ownKey, host.get('_id'))};
-//     };
-//     function saveCallback(ob) {
-//       return function() {ob.save()};
-//     };
-//     
-//     //create add Function
-//     this['addTo' + Support.capitalize(assocName) ] = function(objects) {
-//       if (!(objects instanceof Array)) objects = [objects];
-//       for (var i=0; i < objects.length; i++) {
-//         var o = objects[i];
-//         if (o == null) continue;
-//         if (this.get('_id') != null) { // We have an id, assign it immediately
-//           o.set(ownKey, this.get('_id'));
-//         } else { // We don't have an id, defer assignment to afterSave
-//           this.unsavedHasManyCallbacks.push(setCallback(ownKey, o));
-//         }
-//         //TODO: Bei state == removed nen Fehler werfen
-//         this.unsavedHasManyCallbacks.push(saveCallback(o));
-//         this.unsavedHasManyAssociations.push(o);
-//       };
-//       if (this.unsavedHasManyCallbacks.length > 0) this.taint();
-//     }
-//     
-//     
-//     //create remove function
-//     this['removeFrom' + Support.capitalize(assocName) ] = function(objects) {
-//       if (!(objects instanceof Array)) objects = [objects];
-//       for (var i=0; i < objects.length; i++) {
-//         var o = objects[i];
-//         //remove from Database
-//         if (this.get('_id') != null && o.get(ownKey) == this.get('_id')) {
-//           var originalState = o.state;
-//           o.erase(ownKey);
-//           if (originalState == 'clean') o.save();
-//         }
-//         //remove from Cache
-//         for (var n=0; n < this.unsavedHasManyAssociations.length; n++) {
-//           if (this.unsavedHasManyAssociations[n] == o) this.unsavedHasManyAssociations.splice(i,1)
-//         };
-//       };
-//     }
-//     
-//     //install save callback
-//     var callback = function() {
-//       for (var i=0; i < this.unsavedHasManyCallbacks.length; i++) {
-//         this.unsavedHasManyCallbacks[i](this);
-//       };
-//       this.unsavedHasManyAssociations = [];
-//       this.unsavedHasManyCallbacks    = [];
-//     }
-//     
-//     this.model.installCallback('afterSave', callback);
-//   }
-// }

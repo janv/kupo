@@ -1,12 +1,34 @@
 var Support = require('kupo/support').Support;
 var Common  = require('./common').Common;
 
-
+/**
+ * Proxy for a BelongsTo association
+ *
+ * This constructor creates a BelongsTo association proxy that can be attached to
+ * a model instance.
+ *
+ * The BelongsTo association is a directed 1-1 association from a model A to a model B with
+ * the foreign key being stored in instances of model A.
+ *
+ * Assigning an object to a BelongsTo association does not automatically save
+ * the object. It does not save the associated object either.
+ * Assigning a new object B (not stored in the DB, so it doesn't have an ID yet)
+ * to the association in A, marks A as dirty and saves B as soon as A is saved.
+ *
+ * @constructor
+ * @param instance    The model instance this proxy operates on
+ * @param targetModel The target model class of the association
+ * @param assocName   The associations name
+ * @param options     An object containing various options, currently only `foreignKey`
+ */
 var BelongsToProxy = function(instance, targetModel, assocName, options) {
   var foreignKey = (options || {}).foreignKey || (assocName + '_id');
   this.cache = null;
   this.beforeSaveCallbacks = [];
   
+  /**
+   * Set the target of this association. Pass a model instance or just an ID.
+   */
   this.set = function(idOrInstance){
     if (Common.isPlainKey(idOrInstance)) {
       instance.set(foreignKey, idOrInstance);      
@@ -23,6 +45,10 @@ var BelongsToProxy = function(instance, targetModel, assocName, options) {
     }
   };
   
+  /**
+   * Retrieve the target of this association.
+   * Pass true to skip the cache and retrieve the target directly from the database
+   */
   this.get = function(skipCache){
     if (!this.cache || (skipCache == true)) {
       if (instance.get(foreignKey) == null) return null;
@@ -31,23 +57,33 @@ var BelongsToProxy = function(instance, targetModel, assocName, options) {
     return this.cache;
   };
   
+  /**
+   * Remove the association.
+   */
   this.remove  = function(){
     instance.erase(foreignKey);
     this.cache = null;
   };
   
+  /**
+   * Make a new instance and set it as the target of this association
+   */
   this.makeNew = function(p){
     var t = targetModel.makeNew(p);
     this.set(t);
     return t;
   };
   
+  /**
+   * Create an instance and set it as the target of this association
+   */
   this.create = function(p){
     var t = targetModel.create(p);
     this.set(t);
     return t;
   };
   
+  /** @private */
   this.beforeSave = function(){
     for (var i=0; i < this.beforeSaveCallbacks.length; i++) {
       this.beforeSaveCallbacks[i]();
@@ -56,20 +92,8 @@ var BelongsToProxy = function(instance, targetModel, assocName, options) {
   }
 }
 
-
 /**
- * Returns the association object that gets stored in the CommonInstanceProtoype
- *
- * The AssociationObject has 2 Functions:
- * - installProxy gets called in the constructor of a new instance,
- *   gets the instance and the associationName as a Parameter and installs the
- *   proxy in the instance;
- * - registerCallbacks gets called when the instancePrototype is created.
- *   it registers the associations callbacks in the instancePrototype.
- *   These callbacks can read the data of the AssociationProxy through the
- *   instance which contains the Proxy.
- *
- *  TODO: Put this text in model.js
+ * This function generates an association definition for this type of association
  */
 exports.belongsTo = function(targetModel, options) {
   return {

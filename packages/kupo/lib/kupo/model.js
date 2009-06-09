@@ -202,16 +202,32 @@ CommonInstancePrototype.derive = function(_instanceSpec, _model){
   return ip;
 }
 
-// Call only on Instance Prototype, otherwise the assocs are installed on the 
-// Common Instance prototype
+/**
+ * Called during instancePrototype creation
+ *
+ * Executes registerCallback methods of every associations.
+ *
+ * Call only on Instance Prototype, otherwise the associations are installed on the
+ * Common Instance prototype
+ * 
+ * @private
+ */
 CommonInstancePrototype.registerAssociationCallbacks = function() {
   for (var a in this.model.specialization.associations) {
     this.model.specialization.associations[a].registerCallbacks(this, a);
   }
 }
 
-// Call only on Instance Prototype, otherwise the assocs are installed on the 
-// Common Instance prototype
+/**
+ * Called during instance initialization
+ *
+ * Executes installProxy methods of every associations.
+ *
+ * Call only on Instance Prototype, otherwise the associations are installed on the
+ * Common Instance prototype
+ * 
+ * @private
+ */
 CommonInstancePrototype.installAssociationProxies = function() {
   for (var a in this.model.specialization.associations) {
     this.model.specialization.associations[a].installProxy(this, a);
