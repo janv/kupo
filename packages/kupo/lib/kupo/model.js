@@ -46,6 +46,18 @@ var ClassPrototype = exports.Model = {
  *   - beforeRemove
  *   - afterRemove
  *   TODO: Store the model callbacks somewhere else
+ * - validations:
+ *   Array of functions that are used to validate the instance
+ * - associations:
+ *   Object containing Association-Name:Association-Definition pairs.
+ *   The Association-Definition is an object containing 2 functions:
+ *   - installProxy gets called in the constructor of a new instance,
+ *     gets the instance and the associationName as a Parameter and installs the
+ *     proxy in the instance;
+ *   - registerCallbacks gets called when the instancePrototype is created.
+ *     it registers the associations callbacks in the instancePrototype.
+ *     These callbacks can read the data of the AssociationProxy through the
+ *     instance which contains the Proxy.
  * o DO NOT OVERWRITE
  */
 ClassPrototype.define = function(_name, _specialization) {
@@ -126,7 +138,11 @@ ClassPrototype.installCallback = function(name, fun) {
 
 // Persistence stuff
 
-/** Pass a reference Object and returns a Mongo DBCursor */
+/**
+ * Pass a reference Object and returns a Mongo DBCursor
+ *
+ * @param ref A MongoDB reference object for QBE
+ */
 ClassPrototype.all = function(ref) {
   ref = ref || {};
   var prot = this.instancePrototype;
@@ -135,7 +151,11 @@ ClassPrototype.all = function(ref) {
   })
 }
 
-/** Pass a reference Object and returns the first found object (or null) */
+/**
+ * Pass a reference Object and returns the first found object (or null)
+ *
+ * @param ref A MongoDB reference object for QBE
+ */
 ClassPrototype.find = function(ref) {
   if (ref.toString().match(/^[abcdef\d]+$/)) {
     var result = this.collection().findId(ref);
@@ -235,7 +255,8 @@ CommonInstancePrototype.installAssociationProxies = function() {
 }
 
 /**
- * Used to add methods defined in InstanceSpec.methods to the CommonInstancePrototype
+ * Used to add methods defined in InstanceSpecialization.methods
+ * to the InstancePrototype
  *
  * @private
  */
