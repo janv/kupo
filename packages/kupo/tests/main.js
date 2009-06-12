@@ -1,5 +1,3 @@
-require('packages').load('..')
-
 // Prepare debug helpers
 var Util = require('../../v8cgi/util').Util
 /** Console Pretty printer */

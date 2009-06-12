@@ -1,4 +1,3 @@
-var jsDump = require('test/jsdump').jsDump;
 var assert = require("test/assert");
 require("kupo/mongo_adapter").MongoAdapter.setConnection("kupo_test");
 var Model  = require("kupo/model").Model;

@@ -1,4 +1,3 @@
-var jsDump = require('test/jsdump').jsDump;
 var assert = require("test/assert");
 var MongoAdapter  = require("kupo/mongo_adapter").MongoAdapter;
 

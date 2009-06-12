@@ -1,5 +1,5 @@
 /** A global reference to the Kupo home directory */
-global.$KUPO_HOME = require("dir").pwd()
+global.$KUPO_HOME = require('file').absolute('.');
 
 // Prepare debug helpers
 var Util = require('./packages/v8cgi/util').Util

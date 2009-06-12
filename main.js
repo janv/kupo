@@ -1,1 +1,1 @@
-load('packages/jack/bin/jackup')
+require('jackup').main(system.args);
