@@ -16,6 +16,11 @@ var DispatcherDB = {
 };
 
 /**
+ * Deliver files to the client
+ */
+serveFile = require("jack/file").File($KUPO_HOME + '/public')
+
+/**
  * Main Jack request handler.
  *
  * @param   env A Jack request environment
@@ -33,7 +38,7 @@ Dispatcher.handle = function(env) {
     var model = fetchModel(controllerName)
     var controller = ResourceController.requestInstance(model)
   } else {
-    return [500, {"Content-Type" : "text/plain"},  ["No model or controller found for " + controllerName]];
+    return serveFile(env);
   }
   try {
     //handle
