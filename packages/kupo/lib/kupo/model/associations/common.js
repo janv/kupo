@@ -1,5 +1,5 @@
 /** The Common Instance Prototype */
-CIP = require('kupo/model').CommonInstancePrototype;
+CIP = require('kupo/model').InstanceConstructor;
 
 /** Helper functions shared by all associations */
 var Common = exports.Common = {

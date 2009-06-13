@@ -2,7 +2,7 @@ var Model = exports.Model = function(_name, _specialization){
   var m  = {"defaultCallables" : ['all', 'find'] };
   m.name = _name;
   
-  m.Instance = new CommonInstancePrototype(_specialization, m);
+  m.Instance = new InstanceConstructor(_specialization, m);
   
   m.rpcCallable = function(name) {
     for (var i=0; i < m.defaultCallables.length; i++) {
@@ -46,7 +46,7 @@ var Model = exports.Model = function(_name, _specialization){
   return m;
 }
 
-var CommonInstancePrototype = exports.CommonInstancePrototype = function(_specialization, _model) {
+var InstanceConstructor = exports.InstanceConstructor = function(_specialization, _model) {
   var ip = {
     "defaultCallables" : ['update'], //TODO DefaultCallables sollten nicht zugreifbar sein
     "errors" : [],
@@ -136,7 +136,7 @@ var CommonInstancePrototype = exports.CommonInstancePrototype = function(_specia
     return (this.errors.length < 1);
   }
   
-  var Instance = function(data, state) {
+  var constructor = function(data, state) {
     this.data = data   || {};
     this.state = state || 'new';
     //TODO: New nur ohne id
@@ -149,7 +149,7 @@ var CommonInstancePrototype = exports.CommonInstancePrototype = function(_specia
     
     this.installAssociationProxies(this);
   }
-  Instance.prototype = ip;
+  constructor.prototype = ip;
   
-  return Instance;
+  return constructor;
 }
