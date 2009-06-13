@@ -6,7 +6,7 @@ var Validations  = require("kupo/model/validations").Validations;
 
 // Sample Model //////////////////////////////////////////////////////////////
 
-var Project = Model.define('project',{
+var Project = new Model('project',{
   instance: {
     callables: ['finish'],
     methods: {
@@ -34,7 +34,7 @@ Project.blubb = function(x) {
 
 exports.testDefinition = {
   testSimple : function() {
-    var TestModel = Model.define('test',{});
+    var TestModel = new Model('test',{});
   },
   
   testDefaultsCallable : function() {
@@ -52,29 +52,23 @@ exports.testDefinition = {
   
   testInitSetsCollectionAndSpecialization : function() {
     assert.isTrue(Project.collection().count() >= 0);
-    assert.isEqual('blubb', Project.specialization.callables[0]);
   },
   
   testDefineSetsInstancePrototype : function() {
-    assert.isTrue(typeof Project.instancePrototype == 'object');
-    assert.isTrue(Project.instancePrototype.state == 'new');
+    assert.isEqual('function', typeof Project.Instance);
+    assert.isEqual('new', (new Project.Instance).state);
   },
   
   testInstDefaultsCallable : function() {
-    assert.isTrue(Project.instancePrototype.rpcCallable('update'));
+    assert.isTrue((new Project.Instance).rpcCallable('update'));
   },
   
   testInstNonDefaultsNotCallable : function() {
-    assert.isTrue(!Project.instancePrototype.rpcCallable('palimpalim'));
+    assert.isTrue(!(new Project.Instance).rpcCallable('palimpalim'));
   },
   
   testInstCustomCallables : function() {
-    assert.isTrue(Project.instancePrototype.rpcCallable('finish'));
-  },
-  
-  testInstRefersSpecAndModel : function() {
-    assert.isEqual(Project, Project.instancePrototype.model);
-    assert.isEqual(Project.specialization.instance, Project.instancePrototype.instanceSpec);
+    assert.isTrue((new Project.Instance).rpcCallable('finish'));
   },
   
   testInstanceMethods : function() {
@@ -86,9 +80,9 @@ exports.testDefinition = {
   },
   
   testInstallsAssociations : function() {
-    var User = Model.define('user', {
+    var User = new Model('user', {
     });
-    var Task = Model.define('task', {
+    var Task = new Model('task', {
       associations : {
         "user" : Associations.belongsTo(User)
       }
@@ -106,7 +100,7 @@ exports.testDefinition = {
   
   testModelRecognition : function() {
     var p = Project.create({a:1});
-    assert.isTrue(p instanceof Project.instancePrototype);
+    assert.isTrue(p instanceof Project.Instance);
   }
 }
 
@@ -290,7 +284,7 @@ exports.testCallbacks = {
 
   setup : function() {
     this.callbacks = {}
-    this.Foo = Model.define('foo',{
+    this.Foo = new Model('foo',{
       callbacks : this.callbacks
     });
     this.Foo.collection().drop();
@@ -410,7 +404,7 @@ exports.testCallbacks = {
 exports.testValidations = {
   setup : function() {
     this.validations = [];
-    this.Foo = Model.define('foo',{
+    this.Foo = new Model('foo',{
       validations : this.validations
     });
     this.Foo.collection().drop();

@@ -101,8 +101,8 @@ exports.belongsTo = function(targetModel, options) {
       instance[assocName] = new BelongsToProxy(instance, targetModel, assocName, options);
     },
     
-    registerCallbacks : function(instancePrototype, assocName) {
-      instancePrototype.model.installCallback('beforeSave', function(){
+    registerCallbacks : function(model, assocName) {
+      model.installCallback('beforeSave', function(){
         this[assocName].beforeSave();
       })
     }

@@ -156,8 +156,8 @@ exports.hasMany = function(targetModel, options) {
       instance[assocName] = new HasManyProxy(instance, targetModel, assocName, options);
     },
     
-    registerCallbacks : function(instancePrototype, assocName) {
-      instancePrototype.model.installCallback('afterSave', function(){
+    registerCallbacks : function(model, assocName) {
+      model.installCallback('afterSave', function(){
         this[assocName].afterSave();
       })
     }

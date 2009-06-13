@@ -7,8 +7,8 @@ var Associations = require("kupo/model/associations").Associations;
 
 exports.testBelongsTo = {
   setup : function() {
-    this.User = Model.define('user', {});
-    this.Task = Model.define('task', {
+    this.User = new Model('user', {});
+    this.Task = new Model('task', {
       associations : {
         "user" : Associations.belongsTo(this.User)
       }
@@ -131,8 +131,8 @@ exports.testBelongsTo = {
 
 exports.testBelongsToMany = {
   setup : function() {
-    this.Task = Model.define('task', {});
-    this.User = Model.define('user', {
+    this.Task = new Model('task', {});
+    this.User = new Model('user', {
       associations : {
         "tasks" : Associations.belongsToMany(this.Task)
       }
@@ -241,8 +241,8 @@ exports.testBelongsToMany = {
 
 exports.testHasOne = {
   setup : function() {
-    this.Task = Model.define('task', {});
-    this.User = Model.define('user', {
+    this.Task = new Model('task', {});
+    this.User = new Model('user', {
       associations : {
         "task" : Associations.hasOne(this.Task)
       }
@@ -345,8 +345,8 @@ exports.testHasOne = {
 
 exports.testHasMany = {
   setup : function() {
-    this.Task = Model.define('task', {});
-    this.User = Model.define('user', {
+    this.Task = new Model('task', {});
+    this.User = new Model('user', {
       associations : {
         "tasks" : Associations.hasMany(this.Task)
       }

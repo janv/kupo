@@ -1,5 +1,4 @@
-var Model = require('kupo/model').Model;
-var Project = Model.define('project',{
+var Project = new require('kupo/model').Model('project',{
   instance: {
     
   },

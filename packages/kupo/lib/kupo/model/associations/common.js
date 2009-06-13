@@ -22,7 +22,7 @@ var Common = exports.Common = {
    * just checks if the object is an instance of ANY model and for NEW-state.
    */
   isNewInstance : function(i, model) {
-    ip = !!model ? model.instancePrototype : CIP;
+    ip = !!model ? model.Instance : CIP;
     return (i instanceof ip && i.state == 'new' );
   },
   
@@ -32,7 +32,7 @@ var Common = exports.Common = {
    * just checks if the object is an instance of ANY model.
    */
   isInstance : function(i, model) {
-    ip = !!model ? model.instancePrototype : CIP;
+    ip = !!model ? model.Instance : CIP;
     return i instanceof ip;
   }
 }
