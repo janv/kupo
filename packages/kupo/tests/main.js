@@ -1,8 +1,6 @@
-// Prepare debug helpers
-var Util = require('../../v8cgi/util').Util
 /** Console Pretty printer */
 global.pp = function (x) {
-  print(Util.serialize(x, true))
+  print(require('test/jsdump').jsDump.parse(x))
 }
 
 exports.testMongoAdapter = require("./mongo_adapter-tests");
