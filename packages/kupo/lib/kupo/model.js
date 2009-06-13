@@ -111,7 +111,10 @@ var Model = exports.Model = function(_name, _specialization){
   
   return m;
 }
-
+/**
+ * Creates an Instance Prototype
+ * generates and returns a Constructor for instances with the IP as its prototype 
+ */
 var InstanceConstructor = exports.InstanceConstructor = function(_specialization, _model) {
   //The instancePrototype
   var ip = {
