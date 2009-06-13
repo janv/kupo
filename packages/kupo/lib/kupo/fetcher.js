@@ -23,7 +23,7 @@ FetchError.prototype.message = function() {
  * @private
  */
 var filename = function(name, type) {
-  return $KUPO_HOME + '/app/' + type + "/" + name + ".js"
+  return $KUPO_HOME + '/app/' + type + "/" + name
 }
 
 /**
@@ -68,7 +68,7 @@ var check = function(name, type) {
     // print("    CHECK: " + e[varName(name,type)])
     return e[varName(name, type)] != undefined
   } catch (error) {
-    print("    CHECK: ERROR " + error)
+    // print("    CHECK: ERROR " + error)
     return false
   }
 }

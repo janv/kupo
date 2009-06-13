@@ -102,7 +102,7 @@ var Model = exports.Model = function(_name, _specialization){
       _specialization.callbacks[name] = [fun];
     }  
   }
-
+  
   // register AssociationCallbacks
   for (var a in _specialization.associations) {
     _specialization.associations[a].registerCallbacks(m, a);

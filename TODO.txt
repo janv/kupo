@@ -4,7 +4,7 @@ TODO
 - Models
   - Client-server persistence
   - Support nested structures
-  - Associations
+  - Document new structure
 
 - Static Asset delivery
   - In Dispatcher check for
