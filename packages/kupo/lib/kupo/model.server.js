@@ -17,6 +17,11 @@ var Model = exports.Model = function(_name, _specialization){
   var collection = conn.getCollection(_name);
   m.collection = function() {return collection;}
   
+  /**
+   * Pass a reference Object and returns a Mongo DBCursor
+   *
+   * @param ref A MongoDB reference object for QBE
+   */
   m.all = function(ref) {
     ref = ref || {};
     return collection.find(ref).map(function(o){
@@ -24,6 +29,11 @@ var Model = exports.Model = function(_name, _specialization){
     })
   }
   
+  /**
+   * Pass a reference Object and returns the first found object (or null)
+   *
+   * @param ref A MongoDB reference object for QBE
+   */
   m.find = function(ref) {
     if (ref.toString().match(/^[abcdef\d]+$/)) {
       var result = collection.findId(ref);
@@ -37,12 +47,14 @@ var Model = exports.Model = function(_name, _specialization){
     }
   }
   
+  /** Create a new Instance with initial data */
   m.makeNew = function(data) {
     data = data || {};
     delete(data['_id']);
     return new m.Instance(data, 'new');
   }
   
+  /** Create a new Instance with initial data and save it */
   m.create = function(data) {
     var i = m.makeNew(data);
     i.save();
@@ -55,6 +67,11 @@ var Model = exports.Model = function(_name, _specialization){
 
 var InstanceConstructor = exports.InstanceConstructor = function(_specialization, _model) {
   var constructor = new generic.InstanceConstructor(_specialization, _model);
+  /**
+   * Save this object to the database
+   *
+   * @return true if the object was saved, false if it wasn't
+   */
   constructor.prototype.save = function() {
     var c = _model.collection();
     switch (this.state) {
@@ -102,6 +119,9 @@ var InstanceConstructor = exports.InstanceConstructor = function(_specialization
     }
   }
 
+  /**
+   * Remove this Instance from the database
+   */
   constructor.prototype.remove = function() {
     this.model.callBack(this, 'beforeRemove');
     if (this.state != 'new') this.model.collection().remove({'_id' : this.data['_id']});
