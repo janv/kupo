@@ -1,6 +1,7 @@
 var Request = require('jack/request').Request;
 var Fetcher = require('kupo/fetcher').Fetcher
 var ResourceController = require('kupo/resource_controller').ResourceController;
+var Errors = require('kupo/errors').Errors;
 
 var Dispatcher = exports.Dispatcher = {}
 
@@ -27,24 +28,57 @@ serveFile = require("jack/file").File($KUPO_HOME + '/public')
  * @returns {Array} A Jack response array
  */
 Dispatcher.handle = function(env) {
-  var request = new Request(env);
-  //resolve
-  var path = request.pathInfo().split('/');
-  var controllerName = path[1] || 'default'
-  var actionName     = path[2] || 'index'
-  if (hasController(controllerName)) {
-    var controller = fetchController(controllerName).requestInstance()
-  } else if (hasModel(controllerName)) {
-    var model = fetchModel(controllerName)
-    var controller = ResourceController.requestInstance(model)
-  } else {
-    return serveFile(env);
-  }
   try {
+    var request = new Request(env);
+    if (request.pathInfo().match(/^\/js/)) {
+      // deliver Javascript
+      return deliverJavascript(request);
+    } else {
+      //resolve
+      var path = request.pathInfo().split('/');
+      var controllerName = path[1] || 'default'
+      var actionName     = path[2] || 'index'
+      if (hasController(controllerName)) {
+        //invoke controller
+        var controller = fetchController(controllerName).requestInstance()
+      } else if (hasModel(controllerName)) {
+        //invoke resource controller
+        var model = fetchModel(controllerName)
+        var controller = ResourceController.requestInstance(model)
+      } else {
+        //deliver static file
+        return serveFile(env);
+      }
+    }
     //handle
     return controller.handle(request)
-  } catch (error) {
-    return [500, {"Content-Type" : "text/plain"},  [error.toString(), error.fileName, error.lineNumber.toString()]];
+  } catch (e) {
+    if (!e.isKupoError) { e = Errors.wrap(e); }
+    return e.to(request.contentType());
+  }
+}
+
+var deliverJavascript = function(request) {
+  var loader = require('sandbox').Loader({
+    paths : [$KUPO_HOME + '/app', $KUPO_HOME + '/packages/kupo/lib'].concat(require.paths)
+  });
+  var id = request.pathInfo().match(/^\/js\/*(.*)/)[1];
+  id = loader.resolve(id, '');
+  if (id.match(/\.server\.js$/)) {
+    throw new Errors.ForbiddenError("Server-only modules are not accessible")
+  } else if (id.match(/^controller\/|\.server\.js$/)) {
+    throw new Errors.ForbiddenError("Controllers are not accessible")
+  } else {
+    try {
+      var text = loader.fetch(id)
+      return [200, {"Content-Type" : "application/javascript"}, [text]];      
+    } catch (e) {
+      if (e.message.match(/require error: couldn't find/)) {
+        throw new Errors.NotFoundError("Module not found", {inner:e})
+      } else {
+        throw e
+      }
+    }
   }
 }
 
