@@ -1,4 +1,221 @@
 /**
+ * The class prototype is the prototype for all model classes
+ * It contains methods and data that are unspecific to any concrete class.
+ */
+var ClassPrototype = exports.ClassPrototype = {
+  "defaultCallables" : ['all', 'find'],
+  
+  /**
+   * Returns true if the named function is remotely callable on the instance
+   *
+   * Follows a predefined pattern first, extends this pattern through definitions
+   * in the instance part of the specialization or can be completely overwritten
+   * to implement special behavior.
+   */
+  rpcCallable : function(name) {
+    for (var i=0; i < this.defaultCallables.length; i++) {
+      if (this.defaultCallables[i] == name) return true;
+    };
+    if (this.spec.callables && this.spec.callables instanceof Array) {
+      for (var i=0; i < this.spec.callables.length; i++) {
+        if (this.spec.callables[i] == name) return true;
+      };
+    }
+    return false;
+  },
+  
+  /**
+   * Used to call callbacks defined in the model on
+   * the instances. Do not call or overwrite.
+   *
+   * @private
+   */
+  callBack : function(context, _callback) {
+    if (this.spec.callbacks
+        && this.spec.callbacks[_callback]) {
+      var callbacks = this.spec.callbacks[_callback];
+      for (var i=0; i < callbacks.length; i++) {
+        callbacks[i].apply(context)
+      };
+    }
+  },
+   
+  /**
+   * Pushes a callback to the end of one of the callback chains
+   *
+   * @param name Name of the callback chain, eg. 'afterSave'
+   * @param fun  The callback-function to add
+   */
+  installCallback :  function(name, fun) {
+    if (!this.spec.callbacks) {
+      this.spec.callbacks = {};
+    }
+    if (this.spec.callbacks[name]) {
+      this.spec.callbacks[name].push(fun);
+    } else {
+      this.spec.callbacks[name] = [fun];
+    }  
+  },
+   
+  /** Create a new Instance with initial data */
+  makeNew : function(data) {
+    data = data || {};
+    delete(data['_id']);
+    return this.makeInstance(data, 'new');
+  },
+
+  /** Create a new Instance with initial data and save it */
+  create : function(data) {
+    var i = this.makeNew(data);
+    i.save();
+    return i;
+  },
+   
+  /**
+   * Creates a model instance based on data object and a state flag.
+   *
+   * This is NOT supposed to be called by the user, it's only used internally to
+   * manufacture instances. Do not call or override this method.
+   *
+   * @param {Object} _data The data describing the objects properties, from the database
+   * @param {String} _state A flag describing the state of the object: new, clean, dirty, deleted
+   *
+   * @private
+   */
+  makeInstance : function(_data, _state) {
+    var instance = Object.create(this.instancePrototype);
+    instance.data  = _data  || {};
+    //TODO: New nur ohne id
+    instance.state = _state || 'new';
+    instance.errors = [];
+    //install Association Proxies;
+    for (var a in this.spec.associations) {
+      this.spec.associations[a].installProxy(instance, a);
+    }
+    
+    return instance;
+  }
+  
+}
+
+/**
+ * The Common Instance Prototype is the prototype for all model instances
+ * It contains methods and data that are unspecific to any concrete model.
+ */
+var CommonInstancePrototype = exports.CommonInstancePrototype = {
+  "defaultCallables" : ['update'],
+  "errors" : [],
+  "state" : 'new', // new, clean, dirty, removed
+
+  /**
+   * Returns true if the named function is remotely callable on the instance
+   *
+   * Follows a predefined pattern first, extends this pattern through definitions
+   * in the instance part of the specialization or can be completely overwritten
+   * to implement special behavior.
+   */
+  rpcCallable : function(name) {
+    for (var i=0; i < this.defaultCallables.length; i++) {
+      if (this.defaultCallables[i] == name) return true;
+    };
+    if (this.model.spec.instance.callables && this.model.spec.instance.callables instanceof Array) {
+      for (var i=0; i < this.model.spec.instance.callables.length; i++) {
+        if (this.model.spec.instance.callables[i] == name) return true;
+      };
+    }
+    return false;
+  },
+  
+  /**
+   * Set properties of this instance. Either provide name and value or just an
+   * object containing names an values of properties you want to update.
+   */
+  set : function(prop, value) {
+    if (typeof prop == "string" || prop instanceof String) {
+      if (prop != '_id' && prop != "_ns") this.data[prop] = value;
+    } else {
+      var newData = prop, overwrite = value;
+      delete(newData['_id']); //TODO: Ooops, hier wird auch aus dem Original gelöscht, baad
+      delete(newData['_ns']);
+      if (overwrite == true){
+        newData._id = this.data._id;
+        newData._ns = this.data._ns;
+        this.data = newData;
+      } else {
+        for (var p in newData) {
+          this.data[p] = newData[p];
+        }      
+      }
+    }
+    this.taint();
+  },
+  
+  /**
+   * Set properties of this instance and save it.
+   *
+   * @see set
+   */
+  update : function(prop, value) {
+    this.set(prop, value);
+    this.save();
+  },
+
+  /**
+   * Access a property of this instance by name.
+   */
+  get : function(property) {
+    return this.data[property];
+  },
+
+  /**
+   * Access _id property of this instance.
+   */
+  id : function() {
+    return this.data['_id'];
+  },
+
+  /**
+   * Erase a property of this instance.
+   */
+  erase : function(property) {
+    delete(this.data[property]);
+    this.taint();
+  },
+
+  /**
+   * Mark this instance as dirty, indicating that it should be saved.
+   */
+  taint : function() {
+    if (this.state == 'clean') this.state = 'dirty';
+  },
+  
+  /**
+   * Validates this instance based on the validation functions in
+   * the 'validations' property of the model's specializaition.
+   * Provide an array with functions there which are executed in this instance's context
+   * in their present order.
+   *
+   * Inside a validation function, push to this.errors to make the validation fail.
+   * Push a string to give an error message for the entire object, or push an array
+   * containing a data property and the error message for this property to explain why
+   * exactly the validation failed.
+   *
+   * @returns True or False, indicating if any of the executed validations added anything to the errors object.
+   */
+  validate : function() {
+    this.errors = [];
+    var s = this.model.spec;
+    if (s.validations instanceof Array) {
+      for (var i=0; i < s.validations.length; i++) {
+        s.validations[i].apply(this)
+      };
+    }
+    return (this.errors.length < 1);
+  },
+  
+}
+
+/**
  * Use this in a model's definition file to define the model,
  * passing the name and the specialization object.
  * The specialization object is a plain object containing a few special keys:
@@ -42,247 +259,36 @@
  *     it registers the associations callbacks in the instancePrototype.
  *     These callbacks can read the data of the AssociationProxy through the
  *     instance which contains the Proxy.
- * o DO NOT OVERWRITE
  */
-var Model = exports.Model = function(_name, _specialization){
-  // The Class Prototype
-  var m  = {"defaultCallables" : ['all', 'find'] };
-  m.name = _name;
-  
-  m.Instance = new InstanceConstructor(_specialization, m);
-  
-  /**
-   * Returns true if the named function is remotely callable on the instance
-   *
-   * Follows a predefined pattern first, extends this pattern through definitions
-   * in the instance part of the specialization or can be completely overwritten
-   * to implement special behavior.
-   */
-  m.rpcCallable = function(name) {
-    for (var i=0; i < m.defaultCallables.length; i++) {
-      if (m.defaultCallables[i] == name) return true;
-    };
-    if (_specialization.callables && _specialization.callables instanceof Array) {
-      for (var i=0; i < _specialization.callables.length; i++) {
-        if (_specialization.callables[i] == name) return true;
-      };
-    }
-    return false;
-  }
+var Model = exports.Model = function(_name, _spec) {
+  this.name = _name;
+  this.spec = _spec;
 
-  /**
-   * Used to call callbacks defined in the model on
-   * the instances. Do not call or overwrite.
-   *
-   * @private
-   */
-  m.callBack = function(context, _callback){
-    if (_specialization.callbacks
-        && _specialization.callbacks[_callback]) {
-      var callbacks = _specialization.callbacks[_callback];
-      for (var i=0; i < callbacks.length; i++) {
-        callbacks[i].apply(context)
-      };
-    }
-  };
-  
-  /**
-   * Pushes a callback to the end of one of the callback chains
-   *
-   * @param name Name of the callback chain, eg. 'afterSave'
-   * @param fun  The callback-function to add
-   */
-  m.installCallback = function(name, fun) {
-    if (!_specialization.callbacks) {
-      _specialization.callbacks = {};
-    }
-    if (_specialization.callbacks[name]) {
-      _specialization.callbacks[name].push(fun);
-    } else {
-      _specialization.callbacks[name] = [fun];
-    }  
+  //aus model.spec register association callbacks
+  for (var a in (this.spec.associations || {})) {
+    this.spec.associations[a].registerCallbacks(this, a);
   }
   
-  // register AssociationCallbacks
-  for (var a in _specialization.associations) {
-    _specialization.associations[a].registerCallbacks(m, a);
-  }
-
-  
-  return m;
+  this.instancePrototype = new InstancePrototype(this)
 }
+Model.prototype = ClassPrototype;
+
 /**
- * Creates an Instance Prototype
- * generates and returns a Constructor for instances with the IP as its prototype 
+ * Used internally to create instance prototypes for models, basically just by
+ * installing custom methods on the prototype
+ * @private
  */
-var InstanceConstructor = exports.InstanceConstructor = function(_specialization, _model) {
-  //The instancePrototype
-  var ip = {
-    "defaultCallables" : ['update'], //TODO DefaultCallables sollten nicht zugreifbar sein
-    "errors" : [],
-    "state" : 'new' // new, clean, dirty, removed
-  };
+var InstancePrototype = exports.InstancePrototype = function(_model){
+  //model verknüpfen
+  this.model = _model;
+  var instanceSpec = ((this.model.spec || {}).instance || {});
   
-  var instanceSpec = ((_specialization || {}).instance || {});
-  
-  ip.model = _model;
-  
-  /**
-   * Called during instance initialization
-   *
-   * Executes installProxy methods of every associations.
-   *
-   * Call only on Instance Prototype, otherwise the associations are installed on the
-   * Common Instance prototype
-   * 
-   * @private
-   */
-  ip.installAssociationProxies = function(instance) { //TODO nach unten in die closure verschieben?
-    for (var a in _specialization.associations) {
-      _specialization.associations[a].installProxy(instance, a);
-    }
+  // Add methods from spec
+  for (var m in (instanceSpec.methods || {})) {
+    if (CommonInstancePrototype[m] == undefined) this[m] = instanceSpec.methods[m];
+    // else throw new Errors.InternalError("Can't overwrite Methods of the common instance prototype");
   }
   
-  //add Methods to instance Prototype
-  var methods = (instanceSpec.methods || {});
-  for (var m in methods) {
-    if (ip[m] == undefined) ip[m] = methods[m];
-  }
-  
-  /**
-   * Returns true if the named function is remotely callable on the instance
-   *
-   * Follows a predefined pattern first, extends this pattern through definitions
-   * in the instance part of the specialization or can be completely overwritten
-   * to implement special behavior.
-   */
-  ip.rpcCallable = function(name) {
-    for (var i=0; i < ip.defaultCallables.length; i++) {
-      if (ip.defaultCallables[i] == name) return true;
-    };
-    if (instanceSpec.callables && instanceSpec.callables instanceof Array) {
-      for (var i=0; i < instanceSpec.callables.length; i++) {
-        if (instanceSpec.callables[i] == name) return true;
-      };
-    }
-    return false;
-  }
-  
-  // PERSISTENCE METHODS
-  
-  /**
-   * Set properties of this instance and save it.
-   *
-   * @see set
-   */
-  ip.update = function(propData, value) {
-    this.set(propData, value);
-    this.save();
-  }
-
-  /**
-   * Set properties of this instance. Either provide name and value or just an
-   * object containing names an values of properties you want to update.
-   */
-  ip.set = function(prop, value) {
-    if (typeof prop == "string" || prop instanceof String) {
-      if (prop != '_id' && prop != "_ns") this.data[prop] = value;
-    } else {
-      var newData = prop, overwrite = value;
-      delete(newData['_id']); //TODO: Ooops, hier wird auch aus dem Original gelöscht, baad
-      delete(newData['_ns']);
-      if (overwrite == true){
-        newData._id = this.data._id;
-        newData._ns = this.data._ns;
-        this.data = newData;
-      } else {
-        for (var p in newData) {
-          this.data[p] = newData[p];
-        }      
-      }
-    }
-    this.taint();
-  }
-  
-  /**
-   * Access a property of this instance by name.
-   */
-  ip.get = function(property) {
-    return this.data[property];
-  }
-  
-  /**
-   * Access _id property of this instance.
-   */
-  ip.id = function() {
-    return this.data['_id'];
-  }
-
-  /**
-   * Mark this instance as dirty, indicating that it should be saved.
-   */
-  ip.taint = function() {
-    if (this.state == 'clean') this.state = 'dirty';
-  }
-
-  /**
-   * Erase a property of this instance.
-   */
-  ip.erase = function(property) {
-    delete(this.data[property]);
-    this.taint();
-  }
-  
-  /**
-   * Validates this instance based on the validation functions in
-   * the 'validations' property of the model's specializaition.
-   * Provide an array with functions there which are executed in this instance's context
-   * in their present order.
-   *
-   * Inside a validation function, push to this.errors to make the validation fail.
-   * Push a string to give an error message for the entire object, or push an array
-   * containing a data property and the error message for this property to explain why
-   * exactly the validation failed.
-   *
-   * @returns True or False, indicating if any of the executed validations added anything to the errors object.
-   */
-  ip.validate = function() {
-    this.errors = [];
-    var s = _specialization;
-    if (s.validations instanceof Array) {
-      for (var i=0; i < s.validations.length; i++) {
-        s.validations[i].apply(this)
-      };
-    }
-    return (this.errors.length < 1);
-  }
-  
-  /**
-   * Creates a model instance based on data object and a state flag.
-   *
-   * This is NOT supposed to be called by the user, it's only used internally to
-   * manufacture instances. Do not call or override this method.
-   *
-   * @param {Object} _data The data describing the objects properties, from the database
-   * @param {String} _state A flag describing the state of the object: new, clean, dirty, deleted
-   *
-   * @private
-   * @constructor
-   */
-  var constructor = function(data, state) {
-    this.data = data   || {};
-    this.state = state || 'new';
-    //TODO: New nur ohne id
-    this.errors = [];
-    
-    // this.getData(){return data;};
-    // this.setData(x){data = x;};
-    // this.getState(){return state;};
-    // this.setState(x){state = x};
-    
-    this.installAssociationProxies(this);
-  }
-  constructor.prototype = ip;
-  
-  return constructor;
 }
+InstancePrototype.prototype = CommonInstancePrototype;
+

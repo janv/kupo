@@ -55,20 +55,20 @@ exports.testDefinition = {
   },
   
   testDefineSetsInstancePrototype : function() {
-    assert.isEqual('function', typeof Project.Instance);
-    assert.isEqual('new', (new Project.Instance).state);
+    assert.isTrue(Project.instancePrototype instanceof require("kupo/model").CommonInstancePrototype)
+    assert.isEqual('new', Project.makeInstance().state);
   },
   
   testInstDefaultsCallable : function() {
-    assert.isTrue((new Project.Instance).rpcCallable('update'));
+    assert.isTrue(Project.makeInstance().rpcCallable('update'));
   },
   
   testInstNonDefaultsNotCallable : function() {
-    assert.isTrue(!(new Project.Instance).rpcCallable('palimpalim'));
+    assert.isTrue(!Project.makeInstance().rpcCallable('palimpalim'));
   },
   
   testInstCustomCallables : function() {
-    assert.isTrue((new Project.Instance).rpcCallable('finish'));
+    assert.isTrue(Project.makeInstance().rpcCallable('finish'));
   },
   
   testInstanceMethods : function() {
@@ -100,7 +100,7 @@ exports.testDefinition = {
   
   testModelRecognition : function() {
     var p = Project.create({a:1});
-    assert.isTrue(p instanceof Project.Instance);
+    assert.isTrue(p instanceof Project.instancePrototype);
   }
 }
 
