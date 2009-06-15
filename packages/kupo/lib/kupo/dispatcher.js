@@ -71,7 +71,7 @@ var deliverJavascript = function(request) {
   } else {
     try {
       var text = loader.fetch(id)
-      return [200, {"Content-Type" : "application/javascript"}, [text]];      
+      return [200, {"Content-Type" : "application/x-javascript"}, [text]];
     } catch (e) {
       if (e.message.match(/require error: couldn't find/)) {
         throw new Errors.NotFoundError("Module not found", {inner:e})
