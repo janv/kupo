@@ -1,5 +1,5 @@
 var Controller  = require('kupo/controller').Controller
-var JRPCRequest = require('kupo/controller').JRPCRequest
+var JRPCRequest = require('kupo/jrpc').JRPCRequest
 var JSON = require('json')
 var Errors = require('kupo/errors').Errors
 var Support = require('kupo/support').Support;
