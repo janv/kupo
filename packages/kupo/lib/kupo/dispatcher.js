@@ -58,19 +58,21 @@ Dispatcher.handle = function(env) {
   }
 }
 
+var independentPaths = require.paths.filter(function(p){return !p.match(/platforms\/rhino/)});
+var deliverLoader = require('sandbox').Loader({
+  paths : [$KUPO_HOME + '/app', $KUPO_HOME + '/packages/kupo/lib'].concat(independentPaths)
+});
+
 var deliverJavascript = function(request) {
-  var loader = require('sandbox').Loader({
-    paths : [$KUPO_HOME + '/app', $KUPO_HOME + '/packages/kupo/lib'].concat(require.paths)
-  });
   var id = request.pathInfo().match(/^\/js\/*(.*)/)[1];
-  id = loader.resolve(id, '');
+  id = deliverLoader.resolve(id, '');
   if (id.match(/\.server\.js$/)) {
     throw new Errors.ForbiddenError("Server-only modules are not accessible")
   } else if (id.match(/^controller\/|\.server\.js$/)) {
     throw new Errors.ForbiddenError("Controllers are not accessible")
   } else {
     try {
-      var text = loader.fetch(id)
+      var text = deliverLoader.fetch(id)
       return [200, {"Content-Type" : "application/x-javascript"}, [text]];
     } catch (e) {
       if (e.message.match(/require error: couldn't find/)) {
