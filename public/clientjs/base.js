@@ -19,7 +19,7 @@ system = {
       isFile: function(url) {
         var retval = null;
         $.ajax({url:url, async: false, complete: function(xhr, status){
-          retval = (xhr.status == 200 && xhr.getResponseHeader("Content-Type") == 'application/x-javascript')
+          retval = (xhr.status == 200 && xhr.getResponseHeader("Content-Type") == 'application/x-javascript');
         }});
         return retval;
       }
@@ -56,6 +56,6 @@ var paths = [];
 paths.push(system.prefix);
 
 // create the primary Loader and Sandbox:
-var loader = sandbox.MultiLoader({paths: paths});
+var loader = sandbox.MultiLoader({paths: paths, extensions : ["", ".client.js", ".js"]});
 var modules = {system: system, sandbox: sandbox};
 global.require = sandbox.Sandbox({loader: loader, modules: modules});
