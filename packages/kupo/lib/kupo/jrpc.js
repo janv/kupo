@@ -1,3 +1,4 @@
+var JSON = require('json');
 /**
  * Wrapper for JRPCRequests, provinding some convenience
  * @private
@@ -27,7 +28,7 @@ JRPCRequest.fromGET = function(methodName, request){
  */
 JRPCRequest.fromPOST = function(request){
   var r = new JRPCRequest(request);
-  var call = JSON.parse(request.body());
+  var call = JSON.parse(request.body().read().decodeToString());
   r.methodName = call.method;
   r.parameters = call.params
   return r;
