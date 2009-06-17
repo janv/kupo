@@ -80,9 +80,23 @@ JRPCRequest.buildResponse = function(status, result) {
  * @param status The status of the response
  * @param error  An object or string describing the error
  */
-JRPCRequest.buildError = function(status, error) {
-  var r = {};
-  r.error = error; // TODO JRPC Error spezifikation beachten
-  r.version = "1.1"
+JRPCRequest.buildError = function(error, status) {
+  var r = {version: '1.1'};
+  if (error.isKupoError) {
+    r.error = {
+      name: error.name,
+      code: error.code || status || 000,
+      message: error.message,
+      description: error.description,
+      error : error.backtrace()
+    }
+  } else if (error.name) {
+    r.error = {
+      name: error.name,
+      code: status || 000,
+      message: error.message || "",
+      error: error
+    };
+  }
   return [status, {"Content-Type" : "text/plain"}, [JSON.stringify(r)]]
 }
