@@ -3,7 +3,7 @@
  * It contains methods and data that are unspecific to any concrete class.
  */
 var ClassPrototype = exports.ClassPrototype = {
-  "defaultCallables" : ['all', 'find'],
+  "defaultCallables" : ['all', 'find', 'remote_create'],
   
   /**
    * Returns true if the named function is remotely callable on the instance
@@ -103,7 +103,7 @@ var ClassPrototype = exports.ClassPrototype = {
  * It contains methods and data that are unspecific to any concrete model.
  */
 var CommonInstancePrototype = exports.CommonInstancePrototype = {
-  "defaultCallables" : ['update'],
+  "defaultCallables" : ['remote_update'],
   "errors" : [],
   "state" : 'new', // new, clean, dirty, removed
 
