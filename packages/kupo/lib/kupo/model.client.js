@@ -1,9 +1,21 @@
 var generic = require('./model.js');
 var Support = require('kupo/support').Support;
 var JRPCConnection = require('kupo/jrpc_connection').JRPCConnection;
-
+require('object');
 
 var ClassPrototype = exports.ClassPrototype = Object.create(generic.ClassPrototype);
+
+ClassPrototype.wrap = function(objects) {
+  klass = this;
+  function wrapSingle(o) {
+    return klass.makeInstance(o.data, o.state)
+  }
+  if (!(objects instanceof Array)) objects = [objects];
+  for (var i=0; i < objects.length; i++) {
+    objects[i] = wrapSingle(objects[i])
+  };
+  return objects;
+}
 
 /**
  * Pass a reference Object and returns a Mongo DBCursor
@@ -11,7 +23,7 @@ var ClassPrototype = exports.ClassPrototype = Object.create(generic.ClassPrototy
  * @param ref A MongoDB reference object for QBE
  */
 ClassPrototype.all = function(ref) {
-  return this.connection.call('all', ref)
+  return this.wrap(this.connection.call('all', ref));
 }
 
 /**
@@ -20,7 +32,7 @@ ClassPrototype.all = function(ref) {
  * @param ref A MongoDB reference object for QBE
  */
 ClassPrototype.find = function(ref) {
-  return this.connection.call('find', ref)
+  return this.wrap(this.connection.call('find', ref));
 }
 
 
