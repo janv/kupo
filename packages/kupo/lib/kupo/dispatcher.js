@@ -60,7 +60,8 @@ Dispatcher.handle = function(env) {
 
 var independentPaths = require.paths.filter(function(p){return !p.match(/platforms\/rhino/)});
 var deliverLoader = require('sandbox').Loader({
-  paths : [$KUPO_HOME + '/app', $KUPO_HOME + '/packages/kupo/lib'].concat(independentPaths)
+  paths : [$KUPO_HOME + '/app', $KUPO_HOME + '/packages/kupo/lib'].concat(independentPaths),
+  extensions : ["", ".client.js", ".js"]
 });
 
 var deliverJavascript = function(request) {
