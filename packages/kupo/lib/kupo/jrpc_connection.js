@@ -37,6 +37,6 @@ var JRPCConnection = exports.JRPCConnection = function(url, connectionOptions) {
     if (response.hasOwnProperty('error'))
       throw new Error(response.error);
     
-    return JSON.parse(response.result);
+    return JSON.parse(response).result;
   }
 }
