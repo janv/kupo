@@ -27,10 +27,10 @@ ClassPrototype.all = function(ref) {
  * @param ref A MongoDB reference object for QBE
  */
 ClassPrototype.find = function(ref) {
-  if (ref.toString().match(/^[abcdef\d]+$/)) {
-    var result = this.collection().findId(ref);
-  } else {
+  if (typeof ref == 'object') {
     var result = this.collection().findOne(ref);
+  } else { // ref.toString().match(/^[abcdef\d]+$/
+    var result = this.collection().findId(ref);
   }
   if (result == null) {
     return result;
