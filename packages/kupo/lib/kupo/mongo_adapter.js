@@ -108,7 +108,7 @@ Collection.prototype = {
    * @return Cursor over the results
    */
   find : function(ref) {
-    if (ref == null) {
+    if (ref === undefined || ref === null) {
       var cursor = this.mongoCollection.find();
     } else {
       var cursor =  this.mongoCollection.find(createDoc(ref));

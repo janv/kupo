@@ -41,23 +41,59 @@ JRPCRequest.prototype = {
     return this.methodName
   },
 
-  /** The method parameters as an array */
+  /**
+   * The method parameters as an array
+   *
+   * Returns null if no parameters were provided
+   */
   getParameters : function() {
-    var retval = []
-    for(key in this.parameters) {
-      retval.push(this.parameters[key])
+    if (this.parameters != null && this.parameters != undefined) {
+      if (this.parameters instanceof Array) {
+        return this.parameters;
+      } else  if (typeof this.parameters == 'object'){
+        var retval = [];
+        for(key in this.parameters) {
+          retval.push(this.parameters[key]);
+        }
+        return retval;
+      } else {
+        throw new Errors.InternalError("params neither Array nor object but " + this.parameters);
+      }
+    } else {
+      return null;
     }
-    return retval;
   },
 
-  /** The method parameters as an object */
+  /**
+   * The method parameters as an object
+   * 
+   * Returns null if no parameters were provided
+   */
   getNamedParameters : function() {
-    return this.parameters
+    if (this.parameters != null && this.parameters != undefined) {
+      if (this.parameters instanceof Array) {
+        retval = {};
+        for (var i=0; i < this.parameters.length; i++) {
+          retval[i] = this.parameters[i];
+        };
+        return retval;
+      } else if (typeof this.parameters == 'object'){
+        return this.parameters;
+      } else {
+        throw new Errors.InternalError("params neither Array nor object but " + this.parameters);
+      }
+    } else {
+      return null;
+    }
   },
 
   /** Call the requested method on the target with the provided parameters */
   call : function(target) {
-    return target[this.methodName].apply(target, this.getParameters())
+    if (this.getParameters != null && this.getParameters != undefined) {
+      return target[this.methodName].call(target, this.getParameters())
+    } else {
+      return target[this.methodName].call(target)
+    }
     //maybe return JRPCResponse
   }
 }

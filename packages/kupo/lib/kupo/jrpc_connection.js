@@ -8,8 +8,6 @@ var JRPCConnection = exports.JRPCConnection = function(url, connectionOptions) {
   }
   
   this.call  = function(procedure, parameters, options){
-    parameters = parameters || [];
-    if (!(parameters instanceof Array)) parameters = [parameters]
     options = options || {};
     var response = null;
 
@@ -18,9 +16,18 @@ var JRPCConnection = exports.JRPCConnection = function(url, connectionOptions) {
     } else {
       var request = {
         method: procedure,
-        version: "1.1",
-        param: parameters
+        version: "1.1"
       }
+
+      if (parameters instanceof Array || typeof parameters == 'object') {
+        request.params = parameters;
+      } else if (parameters === null || parameters === undefined) {
+        // don't add params
+      } else {
+        //single value, wrap in array
+        request.params = [parameters];
+      }
+
       $.ajax({
         type: 'POST',
         url:url,
