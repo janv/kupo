@@ -16,7 +16,7 @@ var JSON = require('json')
 var Error = {
   /** Turn this error into a JRPC response that can be handled by hack */
   "toJRPC" : function() {
-    return JRPCRequest.buildError(this)
+    return JRPCRequest.buildError(this, this.code)
   },
   
   "backtrace" : function(){

@@ -72,7 +72,7 @@ JRPCRequest.buildResponse = function(status, result) {
   var r = {};
   r.result = result;
   r.version = "1.1";
-  return [status, {"Content-Type" : "text/plain"}, [JSON.stringify(r)]];
+  return [status, {"Content-Type" : "application/json"}, [JSON.stringify(r)]];
 }
 
 /**
@@ -99,5 +99,5 @@ JRPCRequest.buildError = function(error, status) {
       error: error
     };
   }
-  return [status, {"Content-Type" : "text/plain"}, [JSON.stringify(r)]]
+  return [status, {"Content-Type" : "application/json"}, [JSON.stringify(r)]]
 }

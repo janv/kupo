@@ -26,17 +26,26 @@ var JRPCConnection = exports.JRPCConnection = function(url, connectionOptions) {
         url:url,
         data: JSON.stringify(request), 
         async: false,
-        success: function(data){
-          response = data;
+        beforeSend: function(xhr) {xhr.setRequestHeader("Accept", "application/json")},
+        complete: function(xhr, textStatus){
+          response = xhr.responseText;
         }
     });
     }
-
-    if (response == null)
-      throw new Error("Error making JRPC call (response = null)");
-    if (response.hasOwnProperty('error'))
-      throw new Error(response.error);
     
-    return JSON.parse(response).result;
+    if (response == null) {
+      throw new Error("Error making JRPC call (response = null)");
+    } else {
+      response = JSON.parse(response);
+      if (response.error) {
+        var e = new Error(response.error.message);
+        for (var x in response.error) {
+          e[x] = response.error[x];
+        }
+        throw e;
+      }
+      return response.result;
+    }
+    
   }
 }

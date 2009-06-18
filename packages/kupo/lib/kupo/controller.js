@@ -62,7 +62,7 @@ var Controller = exports.Controller = {
       return this.response;      
     } catch (e) {
       if (!e.isKupoError) { e = Errors.wrap(e); }
-      return e.to(this.request.contentType());
+      return e.to(this.request.env['HTTP_ACCEPT']);
     }
   }
 }

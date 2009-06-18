@@ -51,10 +51,10 @@ Dispatcher.handle = function(env) {
       }
     }
     //handle
-    return controller.handle(request)
+    return controller.handle(request);
   } catch (e) {
     if (!e.isKupoError) { e = Errors.wrap(e); }
-    return e.to(request.contentType());
+    return e.to(this.request.env['HTTP_ACCEPT']);
   }
 }
 
