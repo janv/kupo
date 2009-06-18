@@ -30,7 +30,7 @@ JRPCRequest.fromPOST = function(request){
   var r = new JRPCRequest(request);
   var call = JSON.parse(request.body().read().decodeToString());
   r.methodName = call.method;
-  r.parameters = call.params
+  r.parameters = call.params;
   return r;
 }
 
