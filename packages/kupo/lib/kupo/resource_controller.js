@@ -90,7 +90,7 @@ ResourceController.process = function() {
  */
 ResourceController.processJRPC = function(target, jrpcRequest){
   if (target[jrpcRequest.getMethodName()] != null && typeof target[jrpcRequest.getMethodName()] == 'function') {
-    if (this.model.rpcCallable(jrpcRequest.getMethodName())) {
+    if (target.rpcCallable(jrpcRequest.getMethodName())) {
       this.result = jrpcRequest.call(target)
       this.model.callBack(this, 'afterProcess')
       //TODO Wenn models zurückgegeben werden, diese irgendwie auspacken, nur die Daten verschicken
