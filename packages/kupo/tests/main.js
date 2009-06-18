@@ -11,11 +11,12 @@ require.loader.loaders.push(['.server.js', serverLoader]);
 require.loader.loaders.reverse();
 
 
-exports.testMongoAdapter     = require("./mongo_adapter-tests");
-exports.testMongoConverter   = require("./mongo-converter-tests");
-exports.testModel            = require("./model-tests");
-exports.testAssociations     = require("./association-tests");
-exports.testDispatcher       = require("./dispatcher-tests");
+exports.testMongoAdapter       = require("./mongo_adapter-tests");
+exports.testMongoConverter     = require("./mongo-converter-tests");
+exports.testModel              = require("./model-tests");
+exports.testAssociations       = require("./association-tests");
+exports.testDispatcher         = require("./dispatcher-tests");
+exports.testResourceController = require("./resource_controller-tests");
 // exports.testModelInheritance = require("./model-inheritance-tests");
 
 require("os").exit(require("test/runner").run(exports));
