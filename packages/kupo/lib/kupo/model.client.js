@@ -1,11 +1,7 @@
 var generic = require('./model.js');
-
-var Errors = require('kupo/errors').Errors;
-var MongoAdapter = require('kupo/mongo_adapter').MongoAdapter
 var Support = require('kupo/support').Support;
+var JRPCConnection = require('kupo/jrpc_connection').JRPCConnection;
 
-//Connection
-var conn = MongoAdapter.getConnection();
 
 var ClassPrototype = exports.ClassPrototype = Object.create(generic.ClassPrototype);
 
@@ -15,10 +11,7 @@ var ClassPrototype = exports.ClassPrototype = Object.create(generic.ClassPrototy
  * @param ref A MongoDB reference object for QBE
  */
 ClassPrototype.all = function(ref) {
-  var self = this;
-  return this.collection().find(ref || {}).map(function(o){
-    return self.makeInstance(o, 'clean');
-  })
+  return this.connection.call('all', ref)
 }
 
 /**
@@ -27,33 +20,9 @@ ClassPrototype.all = function(ref) {
  * @param ref A MongoDB reference object for QBE
  */
 ClassPrototype.find = function(ref) {
-  if (ref.toString().match(/^[abcdef\d]+$/)) {
-    var result = this.collection().findId(ref);
-  } else {
-    var result = this.collection().findOne(ref);
-  }
-  if (result == null) {
-    return result;
-  } else {
-    return this.makeInstance(result, 'clean');
-  }
+  return this.connection.call('find', ref)
 }
 
-/**
- * Creates a new instance from the data, saves it and returns the data of the
- * created instance (which might have been changed by callbacks).
- *
- * Returns the new data or throws an error. Necessary to return the new data
- * back to the client or communicate errors.
- */
-ClassPrototype.remote_create = function(data) {
-  var i = this.create('data')
-  if (i.state == 'clean') { 
-    return i.data;
-  } else {
-    throw new Errors.InternalError("The instance could not be saved", {description: i.errors})
-  } 
-}
 
 
 var CommonInstancePrototype = exports.CommonInstancePrototype = Object.create(generic.CommonInstancePrototype)
@@ -63,7 +32,7 @@ var CommonInstancePrototype = exports.CommonInstancePrototype = Object.create(ge
  * @return true if the object was saved, false if it wasn't
  */
 CommonInstancePrototype.save = function() {
-  var c = this.model.collection();
+  var c = this.model.connection;
   switch (this.state) {
     case 'new':
       delete(this.data['_id']);
@@ -76,7 +45,7 @@ CommonInstancePrototype.save = function() {
       if (valid) {
         this.model.callBack(this, 'beforeSave');
         this.model.callBack(this, 'beforeCreate');
-        this.data = c.insert(this.data);
+        this.data = c.call('create_remote', this.data); // TODO Handle thrown errors correctly
         this.state = 'clean'
         this.model.callBack(this, 'afterCreate');
         this.model.callBack(this, 'afterSave');
@@ -94,7 +63,7 @@ CommonInstancePrototype.save = function() {
       if (valid) {
         this.model.callBack(this, 'beforeSave');
         this.model.callBack(this, 'beforeUpdate');
-        this.data = c.update({'_id': this.data._id}, this.data, true, true);
+        this.data = c.onId(this.id()).call('remote_update', this.data) // TODO Handle thrown errors correctly
         this.state = 'clean'
         this.model.callBack(this, 'afterUpdate');
         this.model.callBack(this, 'afterSave');
@@ -110,28 +79,13 @@ CommonInstancePrototype.save = function() {
 }
 
 /**
- * Handle Update call from the client.
- *
- * Returns the new data or throws an error. Necessary to return the new data
- * back to the client or communicate errors.
- */
-CommonInstancePrototype.remote_update = function(newData) {
-  var c = this.model.collection();
-  var success = this.update(newData, true);
-  if (success) { 
-    return this.data;
-  } else {
-    throw new Errors.InternalError("The instance could not be saved", {description: this.errors})
-  }
-}
-
-
-/**
  * Remove this Instance from the database
  */
 CommonInstancePrototype.remove = function() {
   this.model.callBack(this, 'beforeRemove');
-  if (this.state != 'new') this.model.collection().remove({'_id' : this.data['_id']});
+  if (this.state != 'new') {
+    this.model.connection.onID(this.id()).call('remove');
+  }
   this.state = 'removed';
   this.model.callBack(this, 'afterRemove');
 }
@@ -144,8 +98,7 @@ InstancePrototype.prototype = CommonInstancePrototype;
 var Model = exports.Model = function(_name, _spec) {
   generic.Model.call(this, _name, _spec) //super call
   this.instancePrototype = new InstancePrototype(this)
-  var collection = conn.getCollection(_name);
-  this.collection = function() {return collection;}
+  this.connection = new JRPCConnection('/' + _name);
 }
 Model.prototype = ClassPrototype;
 

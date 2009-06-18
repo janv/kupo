@@ -134,7 +134,8 @@ var CommonInstancePrototype = exports.CommonInstancePrototype = {
     if (typeof prop == "string" || prop instanceof String) {
       if (prop != '_id' && prop != "_ns") this.data[prop] = value;
     } else {
-      var newData = prop, overwrite = value;
+      var newData   = prop,
+          overwrite = value;
       delete(newData['_id']); //TODO: Ooops, hier wird auch aus dem Original gelöscht, baad
       delete(newData['_ns']);
       if (overwrite == true){
@@ -157,7 +158,7 @@ var CommonInstancePrototype = exports.CommonInstancePrototype = {
    */
   update : function(prop, value) {
     this.set(prop, value);
-    this.save();
+    return this.save();
   },
 
   /**
