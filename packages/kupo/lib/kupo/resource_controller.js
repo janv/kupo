@@ -89,7 +89,7 @@ ResourceController.process = function() {
  * @private
  */
 ResourceController.processJRPC = function(target, jrpcRequest){
-  if (typeof target[jrpcRequest.getMethodName()] == 'function') {
+  if (target[jrpcRequest.getMethodName()] != null && typeof target[jrpcRequest.getMethodName()] == 'function') {
     if (this.model.rpcCallable(jrpcRequest.getMethodName())) {
       this.result = jrpcRequest.call(target)
       this.model.callBack(this, 'afterProcess')
