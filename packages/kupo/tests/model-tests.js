@@ -60,7 +60,7 @@ exports.testDefinition = {
   },
   
   testInstDefaultsCallable : function() {
-    assert.isTrue(Project.makeInstance().rpcCallable('update'));
+    assert.isTrue(Project.makeInstance().rpcCallable('remote_update'));
   },
   
   testInstNonDefaultsNotCallable : function() {
