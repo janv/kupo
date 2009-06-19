@@ -94,9 +94,9 @@ JRPCRequest.prototype = {
   /** Call the requested method on the target with the provided parameters */
   call : function(target) {
     if (this.getParameters != null && this.getParameters != undefined) {
-      return target[this.methodName].call(target, this.getParameters())
+      return target[this.methodName].apply(target, this.getParameters())
     } else {
-      return target[this.methodName].call(target)
+      return target[this.methodName].apply(target)
     }
     //maybe return JRPCResponse
   }
