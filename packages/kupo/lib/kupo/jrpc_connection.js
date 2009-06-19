@@ -7,11 +7,30 @@ var JRPCConnection = exports.JRPCConnection = function(url, connectionOptions) {
     return new JRPCConnection(url + '/' + id, connectionOptions);
   }
   
-  this.call  = function(procedure, parameters, options){
-    options = options || {};
+  this.callNamed = function(procedure, parameters) {
+    if (typeof parameters == 'object') {
+      return this.callInternal(procedure, parameters);
+    } else {
+      throw new Error("Please pass named parameters")
+    }
+  }
+  
+  this.call = function(procedure, parameters) {
+    if (parameters instanceof Array) {
+      return this.callInternal(procedure, parameters);
+    } else if (parameters === null || parameters === undefined) {
+      // don't add params
+      return this.callInternal(procedure);
+    } else {
+      //single value, wrap in array
+      return this.callInternal(procedure, [parameters]);
+    }
+  }
+  
+  this.callInternal  = function(procedure, parameters){
     var response = null;
 
-    if ((options.method || connectionOptions.method) == 'GET') {
+    if (connectionOptions.method == 'GET') {
       throw new Error("GET JSON-RPC not implemented")
     } else {
       var request = {
@@ -19,13 +38,10 @@ var JRPCConnection = exports.JRPCConnection = function(url, connectionOptions) {
         version: "1.1"
       }
 
-      if (parameters instanceof Array || typeof parameters == 'object') {
-        request.params = parameters;
-      } else if (parameters === null || parameters === undefined) {
+      if (parameters === null || parameters === undefined) {
         // don't add params
       } else {
-        //single value, wrap in array
-        request.params = [parameters];
+        request.params = parameters;
       }
 
       $.ajax({
