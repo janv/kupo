@@ -59,3 +59,15 @@ paths.push(system.prefix);
 var loader = sandbox.MultiLoader({paths: paths, extensions : ["", ".client.js", ".js"]});
 var modules = {system: system, sandbox: sandbox};
 global.require = sandbox.Sandbox({loader: loader, modules: modules});
+
+
+
+// TESTING 123
+// var con = require('kupo/jrpc_connection').JRPCConnection;
+// var projCon = new con('/project');
+// var projects = projCon.call('all')
+
+var Project = require('model/project').Project;
+var projects = Project.all()
+console.debug(projects)
+// projects[0].update("xxx", 'yyy');
