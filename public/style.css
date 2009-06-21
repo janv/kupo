@@ -1,0 +1,69 @@
+* {
+  font-family: Helvetica;
+}
+
+body {
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  color: white;
+  background: black;
+  padding: .5em;
+  margin: 0;
+}
+
+#log {
+  position: absolute;
+  width: 20%;
+  left: 80%;
+  font-size: smaller;
+/*  border: 1px solid silver;*/
+}
+
+#app {
+  position: absolute;
+  width: 75%;
+}
+
+#project {
+  margin-left: 2em;
+  display: none;
+}
+
+#description {
+  margin-top: 0;
+}
+
+#header {
+  font-size: smaller;
+  background: #DDD;
+  padding: .5em;
+}
+
+#header #available_projects {
+  list-style: none;
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
+#header #available_projects li {
+  display: inline;
+  cursor: pointer;
+}
+
+#log p {
+  margin-left: 1em;
+}
+
+h3 {
+  border-bottom: 2px solid;
+}
+
+h4 {
+  margin: 0;
+  padding: 0;
+}

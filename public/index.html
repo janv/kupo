@@ -5,8 +5,41 @@
 		<title>Kupo Demo</title>
 		<script src="/clientjs/jquery-1.3.2.js"></script>
 		<script src="/clientjs/base.js"></script>
+		<link rel="stylesheet" href="/style.css" type="text/css" charset="utf-8"/>
 	</head>
 	<body>
-		Hello World
+		<h1>Kupo project management demo</h1>
+		<div id="app">
+			<div id="header">
+				Logged in as <span id="logged_in_user">User</span><br/>
+				Available Projects:
+				<ul id="available_projects">
+				</ul>
+			</div>
+			<div id="project">
+				<h2></h2>
+				<h4>Description:</h4>
+				<p id="description"></p>
+				<h3>Tasks</h3>
+				<ul id="tasks">
+				</ul>
+				<h4>Create new task</h4>
+				<form id="new_task">
+					Title<br/>
+					<input type="text" name="title" value="" id="new_title"/><br/>
+					<br/>
+					Description<br/>
+					<textarea name="description" id="new_description"></textarea><br/>
+					<br/>
+					<input type="submit" value="Create" id="new_create" onsubmit="return false;"/>
+				</form>
+			</div>
+		</div>
+		<div id="log">
+			<script type="text/javascript" charset="utf-8">
+				function blarg() {return false}
+			</script>
+			<h3>Log</h3>
+		</div>
 	</body>
 </html>

@@ -32,7 +32,7 @@ system = {
   }
 }
 
-// Initilaize global require
+// Initialize global require
 
 // equivalent to "var sandbox = require('sandbox');"
 var sandboxPath = system.prefix + "/sandbox.js";
@@ -61,13 +61,81 @@ var modules = {system: system, sandbox: sandbox};
 global.require = sandbox.Sandbox({loader: loader, modules: modules});
 
 
+// App libraries
 
-// TESTING 123
-// var con = require('kupo/jrpc_connection').JRPCConnection;
-// var projCon = new con('/project');
-// var projects = projCon.call('all')
+function demolog(msg) {
+  $('#log').append("<p>" + msg + "</p>");
+}
 
-var Project = require('model/project').Project;
-var projects = Project.all()
-console.debug(projects)
-// projects[0].update("xxx", 'yyy');
+function demolog_replace(msg) {
+  $('#log > p:last').replaceWith("<p>" + msg + "</p>");
+}
+
+function demoInit() {
+  demolog("Requiring Project model");
+  var Project = require('model/project').Project;
+  demolog("Loading projects");
+  var projects = Project.all();
+  demolog_replace(projects.length + " Projects loaded");
+
+  //load projects
+  $('#available_projects').empty()
+  $.each(projects, function(){
+    var project = this;
+    $("<li>"+project.get("name")+"</li>")
+      .click(function(){loadProject(project)})
+      .appendTo('#available_projects')
+  })
+}
+
+function loadProject(project) {
+  $('#project').slideUp();
+  $('#project h2').html(project.get("name"));
+  $('#project #description').html(project.get("description"));
+  $('#project').slideDown();
+  loadTasks(project);
+  $('#new_task')
+    .unbind('submit')
+    .bind('submit', function(){
+    try {
+      var t = project.tasks.create(serializeForm($('#new_task')));
+      loadTasks(project);
+    } finally {
+      return false;      
+    }
+  })
+}
+
+function loadTasks(project) {
+  demolog("Loading tasks");
+  var tasks = project.tasks.get();
+  demolog_replace(tasks.length + " Tasks loaded");
+  $('#tasks').empty();
+  $.each(tasks, function(){
+    var task = this;
+    $("<li class=\""+ (task.isDone() ? "done" : '') +"\">"+task.get("title")+"<br/>"+task.get("description")+'<br/><a href="#">delete</a></li>')
+      .appendTo('#tasks')
+      .find('a')
+        .click(function(){
+          try {
+            task.remove();
+            $(this).parent().remove();
+          } catch (e) {
+            console.debug("Error: %o", e);
+          } finally {
+            return false;
+          }
+        })
+      // .click(function(){loadProject(project)})  TOGGLE
+  })
+}
+
+function serializeForm(form) {
+  var retval = {};
+  form.find("input, textarea").each(function() {
+    if (this.name) retval[this.name] = this.value;
+  })
+  return retval;
+}
+
+$(demoInit);
