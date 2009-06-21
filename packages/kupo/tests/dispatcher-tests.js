@@ -16,7 +16,7 @@ exports.testJavascriptDelivery = {
   
   testModel : function() {
     var response = this.request.GET('/js/kupo/model');
-    assert.isTrue(null != response.match(/c.call\('create_remote'/), "'c.call('create_remote' found, model.js delivered");
+    assert.isTrue(null != response.match(/c.call\('remote_create'/), "'c.call('remote_create' found, model.js delivered");
   },
   
   testShouldNotDeliverServerJs : function() {
