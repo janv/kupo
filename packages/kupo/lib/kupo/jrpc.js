@@ -3,7 +3,10 @@ var JSON = require('json');
  * Wrapper for JRPCRequests, provinding some convenience
  * @private
  */
-var JRPCRequest = exports.JRPCRequest = function(request) {}
+var JRPCRequest = exports.JRPCRequest = function(method, params) {
+  this.methodName = method;
+  this.parameters = params;
+}
 
 /**
  * Create a JRPCRequest from a GET request
@@ -13,11 +16,7 @@ var JRPCRequest = exports.JRPCRequest = function(request) {}
  * @constructor
  */
 JRPCRequest.fromGET = function(methodName, request){
-  var r = new JRPCRequest(request);
-  r.methodName = methodName;
-  // TODO Bug im Simpleserver. Keine Arrays unterstützt
-  r.parameters = request.GET();
-  return r;
+  return new JRPCRequest(methodName, request.GET());
 }
 
 /**
@@ -28,7 +27,6 @@ JRPCRequest.fromGET = function(methodName, request){
  */
 JRPCRequest.fromPOST = function(request){
   print("Creating JRPC-Request from POST")
-  var r = new JRPCRequest(request);
   if (request.body().read) {
     var call = JSON.parse(request.body().read().decodeToString());
     print("   call: " + request.body().read().decodeToString());
@@ -36,11 +34,9 @@ JRPCRequest.fromPOST = function(request){
     var call = JSON.parse(request.body());
     print("   call: " + request.body());
   }
-  r.methodName = call.method;
-  print("   method: " + r.methodName);
-  r.parameters = call.params;
-  print("   call: " + JSON.stringify(r.parameters));
-  return r;
+  print("   method: " + call.method);
+  print("   call: " + JSON.stringify(call.params));
+  return new JRPCRequest(call.method, call.params);
 }
 
 

@@ -225,14 +225,10 @@ var CommonInstancePrototype = exports.CommonInstancePrototype = {
  * - instance:
  *   specifies the instance prototype for the model, is passed to InstancePrototype.derive
  * - callbacks:
- *   put callBack methods in here. Currently supported are
+ *   Controller callbacks:
  *   - beforeProcess - Controller Callback
  *   - afterProcess  - Controller Callback
- *   - beforeFind    - Controller Callback
- *   - afterFind     - Controller Callback
- *   - beforeAll     - Controller Callback
- *   - afterAll      - Controller Callback
- *   Not yet supported are model lifecycle callbacks
+ *   Model lifecycle callbacks:
  *   - beforeValidation
  *   - beforeValidationOnCreate
  *   - beforeValidationOnUpdate
@@ -247,7 +243,6 @@ var CommonInstancePrototype = exports.CommonInstancePrototype = {
  *   - afterSave
  *   - beforeRemove
  *   - afterRemove
- *   TODO: Store the model callbacks somewhere else
  * - validations:
  *   Array of functions that are used to validate the instance
  * - associations:

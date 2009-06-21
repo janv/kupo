@@ -12,7 +12,7 @@ exports.testRemoteCalls = {
   },
   
   testProjectAll : function() {
-    var response = this.request.POST('/project/all', {"jack.input": '{"method":"all","version":"1.1","param":[],"id":0}' });
+    var response = this.request.POST('/project', {"jack.input": '{"method":"all","version":"1.1","param":[],"id":0}' });
     assert.isEqual(200, response.status);
   }
 }
