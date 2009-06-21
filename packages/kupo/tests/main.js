@@ -17,7 +17,7 @@ exports.testModel              = require("./model-tests");
 exports.testAssociations       = require("./association-tests");
 exports.testDispatcher         = require("./dispatcher-tests");
 exports.testResourceController = require("./resource_controller-tests");
-exports.testResourceController = require("./jrpc-tests");
+exports.testJRPC               = require("./jrpc-tests");
 // exports.testModelInheritance = require("./model-inheritance-tests");
 
 require("os").exit(require("test/runner").run(exports));
