@@ -47,7 +47,7 @@ ClassPrototype.find = function(ref) {
  * back to the client or communicate errors.
  */
 ClassPrototype.remote_create = function(data) {
-  var i = this.create('data')
+  var i = this.create(data)
   if (i.state == 'clean') { 
     return i.data;
   } else {
