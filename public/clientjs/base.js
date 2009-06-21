@@ -97,16 +97,32 @@ function loadProject(project) {
   $('#new_task')
     .unbind('submit')
     .bind('submit', function(){
-    try {
-      var t = project.tasks.create(serializeForm($('#new_task')));
-      $('#new_task')[0].reset();
-      loadTasks(project);
-    } catch (e) {
-      
-    } finally {
-      return false;      
+      try {
+        var t = project.tasks.create(serializeForm($('#new_task')));
+        if (t.errors.length == 0) {
+          $('#new_task')[0].reset();
+          loadTasks(project);
+        } else {
+          alertErrors(t)
+        }
+      } catch (e) {
+        console.error(e)
+      } finally {
+        return false;      
+      }
+    })
+}
+
+function alertErrors(instance) {
+  var e = "Error:\n"
+  $.each(instance.errors, function() {
+    if (this instanceof Array) {
+      e = e + this[0] + ' ' + this[1] + "\n";
+    } else {
+      e = e + this;
     }
   })
+  alert(e)  
 }
 
 function loadTasks(project) {

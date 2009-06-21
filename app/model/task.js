@@ -18,7 +18,9 @@ var Task = new Model('task',{
   associations: {
     "project" : Associations.belongsTo(Project)
   },
-  validations: [Validations.validatesPresenceOf('project_id')]
+  validations: [Validations.validatesId('project_id'),
+                Validations.validatesNonBlank('description'),
+                Validations.validatesNonBlank('title')]
 });
 
 exports.Task = Task;
