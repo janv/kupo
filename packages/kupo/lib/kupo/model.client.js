@@ -96,7 +96,7 @@ CommonInstancePrototype.save = function() {
 CommonInstancePrototype.remove = function() {
   this.model.callBack(this, 'beforeRemove');
   if (this.state != 'new') {
-    this.model.connection.onID(this.id()).call('remove');
+    this.model.connection.onId(this.id()).call('remove');
   }
   this.state = 'removed';
   this.model.callBack(this, 'afterRemove');
