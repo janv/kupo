@@ -27,14 +27,19 @@ JRPCRequest.fromGET = function(methodName, request){
  * @constructor
  */
 JRPCRequest.fromPOST = function(request){
+  print("Creating JRPC-Request from POST")
   var r = new JRPCRequest(request);
   if (request.body().read) {
     var call = JSON.parse(request.body().read().decodeToString());
+    print("   call: " + request.body().read().decodeToString());
   } else {
     var call = JSON.parse(request.body());
+    print("   call: " + request.body());
   }
   r.methodName = call.method;
+  print("   method: " + r.methodName);
   r.parameters = call.params;
+  print("   call: " + JSON.stringify(r.parameters));
   return r;
 }
 
@@ -93,7 +98,11 @@ JRPCRequest.prototype = {
 
   /** Call the requested method on the target with the provided parameters */
   call : function(target) {
-    if (this.getParameters != null && this.getParameters != undefined) {
+    print("Calling JRPCRequest")
+    print("   method: " + this.methodName);
+    print("   parameters: " + JSON.stringify(this.getParameters()));
+    
+    if (this.getParameters() != null && this.getParameters() != undefined) {
       return target[this.methodName].apply(target, this.getParameters())
     } else {
       return target[this.methodName].apply(target)

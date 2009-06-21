@@ -28,6 +28,7 @@ var JRPCConnection = exports.JRPCConnection = function(url, connectionOptions) {
   }
   
   this.callInternal  = function(procedure, parameters){
+    console.group("Making Ajax Call to %s, calling '%s' with %o", url, procedure, parameters);
     var response = null;
 
     if (connectionOptions.method == 'GET') {
@@ -43,23 +44,32 @@ var JRPCConnection = exports.JRPCConnection = function(url, connectionOptions) {
       } else {
         request.params = parameters;
       }
+      console.debug("Request: %o", request);
 
       $.ajax({
         type: 'POST',
         url:url,
         data: JSON.stringify(request), 
         async: false,
-        beforeSend: function(xhr) {xhr.setRequestHeader("Accept", "application/json")},
+        beforeSend: function(xhr) {
+          console.debug("RequestText: %o", JSON.stringify(request));
+          console.debug("XHR: %o", xhr);
+          xhr.setRequestHeader("Accept", "application/json");
+        },
         complete: function(xhr, textStatus){
           response = xhr.responseText;
+          console.debug("ResponseText: %o", response);
         }
     });
     }
     
     if (response == null) {
+      console.groupEnd();
       throw new Error("Error making JRPC call (response = null)");
     } else {
       response = JSON.parse(response);
+      console.debug("Parsed Response: %o", response);
+      console.groupEnd();
       if (response.error) {
         var e = new Error(response.error.message);
         for (var x in response.error) {
