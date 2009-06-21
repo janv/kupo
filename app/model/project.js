@@ -1,4 +1,7 @@
 var Model = require('kupo/model').Model;
+var Associations = require('kupo/model/associations').Associations;
+var Task = require('./task.js').Task;
+
 var Project = new Model('project',{
   instance: {
     
@@ -6,11 +9,14 @@ var Project = new Model('project',{
   callables: ['blubb'],
   callbacks: {
     beforeProcess: [function(){
-      print('PROJECT beforeProcess callback executing')
+      // print('PROJECT beforeProcess callback executing')
     }],
     afterProcess: [function(){
-      print('PROJECT afterProcess callback executing')
+      // print('PROJECT afterProcess callback executing')
     }]
+  },
+  associations: {
+    "tasks" : Associations.hasMany(Task)
   }
 });
 
