@@ -17,6 +17,16 @@ var Validations = exports.Validations = {
         this.errors.push([prop, 'does not match' + regex])
       }
     }
+  },
+  
+  validatesPresenceOf : function(prop) {
+    return function(){
+      if (this.get(prop) === undefined) {
+        this.errors.push([prop, 'may not be undefined'])
+      } else {
+        return true
+      }
+    }
   }
   
 }
