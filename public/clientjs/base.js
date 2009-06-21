@@ -99,7 +99,10 @@ function loadProject(project) {
     .bind('submit', function(){
     try {
       var t = project.tasks.create(serializeForm($('#new_task')));
+      $('#new_task')[0].reset();
       loadTasks(project);
+    } catch (e) {
+      
     } finally {
       return false;      
     }
@@ -113,20 +116,33 @@ function loadTasks(project) {
   $('#tasks').empty();
   $.each(tasks, function(){
     var task = this;
-    $("<li class=\""+ (task.isDone() ? "done" : '') +"\">"+task.get("title")+"<br/>"+task.get("description")+'<br/><a href="#">delete</a></li>')
-      .appendTo('#tasks')
-      .find('a')
+    var li = $("<li class=\""+ (task.isDone() ? "done" : '') +"\">"+task.get("title")+"<br/>"+task.get("description")+'</li>')
+      .appendTo('#tasks');
+    $('<br/><a href="#">delete</a>')
+      .appendTo(li)
+      .click(function(){
+        try {
+          task.remove();
+          $(this).parent().remove();
+        } catch (e) {
+          console.debug("Error: %o", e);
+        } finally {
+          return false;
+        }
+      })
+      li.append(" ")
+      $('<a href="#">toggle</a>')
+        .appendTo(li)
         .click(function(){
           try {
-            task.remove();
-            $(this).parent().remove();
+            task.toggle();
+            li.toggleClass('done', task.isDone());
           } catch (e) {
             console.debug("Error: %o", e);
           } finally {
             return false;
           }
         })
-      // .click(function(){loadProject(project)})  TOGGLE
   })
 }
 

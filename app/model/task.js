@@ -8,7 +8,11 @@ var Task = new Model('task',{
     methods : {
       toggle : function() {
         this.update("done", !this.get('done'));
+      },
+      isDone : function() {
+        return !!this.get('done');
       }
+      
     }
   },
   associations: {
