@@ -28,9 +28,11 @@ ResourceController.requestInstance = function(_model){
 ResourceController.process = function() {
   this.buildRequest();
   
-  this.model.callBack(this, 'beforeProcess')  
-  this.executeRequest();
-  this.model.callBack(this, 'afterProcess')
+  this.model.callBack(this, 'beforeProcess');
+  if (!this.result) { //TODO Document this behaviour
+    this.executeRequest();
+    this.model.callBack(this, 'afterProcess');
+  }
   
   return JRPCRequest.buildResponse(200, this.result);
 };
