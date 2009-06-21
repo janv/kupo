@@ -103,7 +103,7 @@ var ClassPrototype = exports.ClassPrototype = {
  * It contains methods and data that are unspecific to any concrete model.
  */
 var CommonInstancePrototype = exports.CommonInstancePrototype = {
-  "defaultCallables" : ['remote_update'],
+  "defaultCallables" : ['remote_update', 'remove'],
   "errors" : [],
   "state" : 'new', // new, clean, dirty, removed
 
