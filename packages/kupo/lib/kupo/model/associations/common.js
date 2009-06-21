@@ -22,8 +22,8 @@ var Common = exports.Common = {
    * just checks if the object is an instance of ANY model and for NEW-state.
    */
   isNewInstance : function(i, model) {
-    ip = !!model ? model.instancePrototype : CIP;
-    return (i instanceof ip && i.state == 'new' );
+    if (i && i.state != 'new') return false;
+    return this.isInstance(i, model);
   },
   
   /**
@@ -32,7 +32,11 @@ var Common = exports.Common = {
    * just checks if the object is an instance of ANY model.
    */
   isInstance : function(i, model) {
-    ip = !!model ? model.instancePrototype : CIP;
-    return i instanceof ip;
+    if (i === null || i === undefined) return false;
+    if (model) {
+      return i.model.name == model.name;
+    } else {
+      return !!i.model && !!i.model.name;
+    }
   }
 }
