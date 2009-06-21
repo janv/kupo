@@ -57,7 +57,7 @@ CommonInstancePrototype.save = function() {
       if (valid) {
         this.model.callBack(this, 'beforeSave');
         this.model.callBack(this, 'beforeCreate');
-        this.data = c.call('remote_create', this.data); // TODO Handle thrown errors correctly
+        this.data = c.call('create', this.data); // TODO Handle thrown errors correctly
         this.state = 'clean'
         this.model.callBack(this, 'afterCreate');
         this.model.callBack(this, 'afterSave');
@@ -75,7 +75,7 @@ CommonInstancePrototype.save = function() {
       if (valid) {
         this.model.callBack(this, 'beforeSave');
         this.model.callBack(this, 'beforeUpdate');
-        this.data = c.onId(this.id()).call('remote_update', this.data) // TODO Handle thrown errors correctly
+        this.data = c.onId(this.id()).call('update', this.data) // TODO Handle thrown errors correctly
         this.state = 'clean'
         this.model.callBack(this, 'afterUpdate');
         this.model.callBack(this, 'afterSave');

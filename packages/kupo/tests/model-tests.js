@@ -26,6 +26,10 @@ var Project = new Model('project',{
   }
 });
 
+//remove remoting callbacks
+Project.spec.callbacks.afterProcess.pop();
+Project.spec.callbacks.afterProcess.pop();
+
 Project.blubb = function(x) {
   return "This is the result of the blubb test-function which multiplies the argument by 3: " + ( 3 * x ).toString()
 }
@@ -60,7 +64,7 @@ exports.testDefinition = {
   },
   
   testInstDefaultsCallable : function() {
-    assert.isTrue(Project.makeInstance().rpcCallable('remote_update'));
+    assert.isTrue(Project.makeInstance().rpcCallable('update'));
   },
   
   testInstNonDefaultsNotCallable : function() {
@@ -114,7 +118,6 @@ exports.testControllerCallbacks = function() {
   Project.callBack(context, 'afterProcess');
   assert.isTrue(context.beforeProcessExecuted);
   assert.isTrue(context.afterProcessExecuted);
-  // TODO  beforeFind afterFind beforeAll afterAll
 }
 
 exports.testNewInstances = {

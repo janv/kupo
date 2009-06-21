@@ -39,23 +39,6 @@ ClassPrototype.find = function(ref) {
   }
 }
 
-/**
- * Creates a new instance from the data, saves it and returns the data of the
- * created instance (which might have been changed by callbacks).
- *
- * Returns the new data or throws an error. Necessary to return the new data
- * back to the client or communicate errors.
- */
-ClassPrototype.remote_create = function(data) {
-  var i = this.create(data)
-  if (i.state == 'clean') { 
-    return i.data;
-  } else {
-    throw new Errors.InternalError("The instance could not be saved", {description: i.errors})
-  } 
-}
-
-
 var CommonInstancePrototype = exports.CommonInstancePrototype = Object.create(generic.CommonInstancePrototype)
 /**
  * Save this object to the database
@@ -110,23 +93,6 @@ CommonInstancePrototype.save = function() {
 }
 
 /**
- * Handle Update call from the client.
- *
- * Returns the new data or throws an error. Necessary to return the new data
- * back to the client or communicate errors.
- */
-CommonInstancePrototype.remote_update = function(newData) {
-  var c = this.model.collection();
-  var success = this.update(newData, true);
-  if (success) { 
-    return this.data;
-  } else {
-    throw new Errors.InternalError("The instance could not be saved", {description: this.errors})
-  }
-}
-
-
-/**
  * Remove this Instance from the database
  */
 CommonInstancePrototype.remove = function() {
@@ -136,8 +102,48 @@ CommonInstancePrototype.remove = function() {
   this.model.callBack(this, 'afterRemove');
 }
 
+// Remoting callbacks ////////////////////////////////////////////////////////
+
+/**
+ * Creates a new instance from the data, saves it and returns the data of the
+ * created instance (which might have been changed by model callbacks).
+ *
+ * Returns the new data or throws an error. Necessary to return the new data
+ * back to the client or communicate errors.
+ */
+var remoteCreate = function() {
+  if (this.target == this.model && this.jrpcRequest.getMethodName() == 'create') {
+    var instance = this.result;
+    if (instance.state == 'clean') {
+      return instance.data;
+    } else {
+      throw new Errors.InternalError("The instance could not be saved", {description: instance.errors})
+    }
+  }
+}
+
+/**
+ * Callback to handle Update call from the client.
+ *
+ * Returns the new data or throws an error. Necessary to return the new data
+ * back to the client or communicate errors.
+ */
+var remoteUpdate = function() {
+  if (this.target != this.model && this.jrpcRequest.getMethodName() == 'update') {
+    var success = this.result;
+    if (success) { 
+      this.result = this.target.data;
+    } else {
+      throw new Errors.InternalError("The instance could not be saved", {description: this.target.errors})
+    }
+  }
+}
+
+// Prototypes ////////////////////////////////////////////////////////////////
+
 var InstancePrototype = InstancePrototype = function(model) {
   generic.InstancePrototype.call(this, model); //super call
+  
 }
 InstancePrototype.prototype = CommonInstancePrototype;
 
@@ -146,6 +152,8 @@ var Model = exports.Model = function(_name, _spec) {
   this.instancePrototype = new InstancePrototype(this)
   var collection = conn.getCollection(_name);
   this.collection = function() {return collection;}
+  
+  this.installCallback('afterProcess', remoteUpdate);
+  this.installCallback('afterProcess', remoteCreate);
 }
 Model.prototype = ClassPrototype;
-
