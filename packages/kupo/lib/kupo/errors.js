@@ -16,7 +16,7 @@ var JSON = require('json')
 var Error = {
   /** Turn this error into a JRPC response that can be handled by hack */
   "toJRPC" : function() {
-    return JRPCRequest.buildError(this, this.code)
+    return JRPCRequest.buildError(this, this.code, this.headers)
   },
   
   "backtrace" : function(){
@@ -58,6 +58,7 @@ var Error = {
       this.description += "\n " + this.inner.name + " - " + this.inner.message + " in " + this.inner.fileName + ":" + this.inner.lineNumber;
       this.lineNumber = this.inner.lineNumber;
     }
+    if (_details.headers) this.headers = _details.headers; //TODO document this (What kinds of details are used)
   },
   
   /** Used to recognize this as a Kupo Error */

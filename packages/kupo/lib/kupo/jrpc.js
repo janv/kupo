@@ -113,11 +113,14 @@ JRPCRequest.prototype = {
  * @param status The status of the response
  * @param result The result of the call that should be returned to the client
  */
-JRPCRequest.buildResponse = function(status, result) {
+JRPCRequest.buildResponse = function(status, result, headers) {
+  headers = headers || {};
+  headers["Content-Type"] = headers["Content-Type"] || 'application/json'
+  
   var r = {};
   r.result = result;
   r.version = "1.1";
-  return [status, {"Content-Type" : "application/json"}, [JSON.stringify(r)]];
+  return [status, headers, [JSON.stringify(r)]];
 }
 
 /**
@@ -126,7 +129,10 @@ JRPCRequest.buildResponse = function(status, result) {
  * @param status The status of the response
  * @param error  An object or string describing the error
  */
-JRPCRequest.buildError = function(error, status) {
+JRPCRequest.buildError = function(error, status, headers) {
+  headers = headers || {};
+  headers["Content-Type"] = headers["Content-Type"] || 'application/json'
+
   var r = {version: '1.1'};
   if (error.isKupoError) {
     r.error = {
@@ -144,5 +150,5 @@ JRPCRequest.buildError = function(error, status) {
       error: error
     };
   }
-  return [status, {"Content-Type" : "application/json"}, [JSON.stringify(r)]]
+  return [status, headers, [JSON.stringify(r)]]
 }
