@@ -136,7 +136,7 @@ var CommonInstancePrototype = exports.CommonInstancePrototype = {
     } else {
       var newData   = prop,
           overwrite = value;
-      delete(newData['_id']); //TODO: Ooops, hier wird auch aus dem Original gelöscht, baad
+      delete(newData['_id']); //TODO: Ooops, deleting from original object, baad
       delete(newData['_ns']);
       if (overwrite == true){
         newData._id = this.data._id;
@@ -275,7 +275,7 @@ Model.prototype = ClassPrototype;
  * @private
  */
 var InstancePrototype = exports.InstancePrototype = function(_model){
-  //model verknüpfen
+  //link to model
   this.model = _model;
   var instanceSpec = ((this.model.spec || {}).instance || {});
   
