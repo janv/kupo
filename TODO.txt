@@ -2,11 +2,9 @@ TODO
 ==============================================================================
 
 - Models
-  - Client-server persistence
   - Support nested structures
+  - Autodelegation
 
 - Clientside Libraries
-  - Model Loader (sandbox engine)
-  - JRPC
   - Helper
   - Templating
