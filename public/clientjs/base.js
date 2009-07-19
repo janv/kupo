@@ -76,6 +76,11 @@ function demoInit() {
   var Project = require('model/project').Project;
   demolog("Loading projects");
   var projects = Project.all();
+  if (projects.length == 0) {
+    demolog("No Project existing, creating one");
+    Project.create({name: "Testproject", description: "Testdescription"});
+    projects = Project.all();
+  }
   demolog_replace(projects.length + " Projects loaded");
 
   //load projects
