@@ -34,15 +34,25 @@ CustomController.requestInstance = function(){
 }
 
 /**
- * Determine the Action a GET request should serve
+ * Generate a JRPC object for the Request
  *
  * @private
  */
-CustomController.getAction = function(){
-  var urlparts = this.request.pathInfo().split('/')
-  urlparts.shift();  //remove blank string
-  urlparts.shift();  //remove Controller
-  return urlparts[0] || 'index';
+CustomController.createRequest = function() {
+  var method   = this.request.requestMethod();
+  var urlparts = this.request.pathInfo().split('/');
+  urlparts.shift();   //remove empty string
+  urlparts.shift();   //remove controller
+  var action   = ((urlparts[0] || '').match(/^\w+$/i) || [])[0];
+  action = action || 'index'
+
+  if        (method == 'GET' ) { // simple index action
+    return JRPCRequest.fromGET(action, this.request);
+  } else if (method == 'POST') { // simple show/fetch action
+    return JRPCRequest.fromPOST(this.request);
+  } else {
+      throw new Errors.NotImplementedError()
+  }
 }
 
 /**
@@ -52,10 +62,12 @@ CustomController.getAction = function(){
  * @private
  */
 CustomController.process = function() {
-  var method = this.request.requestMethod();
-  if (this.actions && this.actions[this.getAction()]) {
-    return this.actions[this.getAction()].apply(this)
+  var jr = this.createRequest();
+  
+  var methodName = jr.getMethodName()
+  if (this[methodName] != null && typeof this[methodName] == 'function') {
+    return jr.call(this);
   } else {
-    throw new Errors.NotFoundError("Method " + this.getAction() + " does not exist in controller " + this.name)
+    throw new Errors.NotFoundError("Unknown action " + methodName + " in controller " + this.name);
   }
 }

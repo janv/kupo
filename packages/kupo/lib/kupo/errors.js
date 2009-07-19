@@ -58,7 +58,7 @@ var Error = {
       this.description += "\n " + this.inner.name + " - " + this.inner.message + " in " + this.inner.fileName + ":" + this.inner.lineNumber;
       this.lineNumber = this.inner.lineNumber;
     }
-    if (_details.headers) this.headers = _details.headers; //TODO document this (What kinds of details are used)
+    if ((_details || {}).headers) this.headers = _details.headers; //TODO document this (What kinds of details are used)
   },
   
   /** Used to recognize this as a Kupo Error */

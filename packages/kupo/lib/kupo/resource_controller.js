@@ -61,12 +61,12 @@ ResourceController.process = function() {
  * @private
  */
 ResourceController.buildRequest = function() {
-   var method    = this.request.requestMethod()
+   var method   = this.request.requestMethod()
    var urlparts = this.request.pathInfo().split('/')
    urlparts.shift();   //remove empty string
    urlparts.shift();   //remove model
-   var id        = ((urlparts[0] || '').match(/^[0-9a-f]{24}$/i) || [])[0] // an instance id if we have one
-   var proc    = id ? urlparts[1] : urlparts[0] // the procedure to call (for GET-JRPC)
+   var id       = ((urlparts[0] || '').match(/^[0-9a-f]{24}$/i) || [])[0] // an instance id if we have one
+   var proc     = id ? urlparts[1] : urlparts[0] // the procedure to call (for GET-JRPC)
    
    if        (method == 'GET'  && !id && !proc) { // simple index action
        this.target = this.model;
