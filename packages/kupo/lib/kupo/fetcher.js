@@ -1,21 +1,7 @@
-var Fetcher = exports.Fetcher = {}
 var Support = require('kupo/support').Support;
+var Errors  = require('kupo/errors').Errors;
 
-//TODO: Deprecated, replace by proper Error from errors.js
-var FetchError = function(_name, _type){
-  this.name = _name;
-  this.type = _type
-}
-
-//TODO: Deprecated, replace by proper Error from errors.js
-FetchError.prototype.message = function() {
-  if (this.type == 'controller')
-    return "Controller " + this.name + " was not found"
-  else if (this.type == 'model')
-    return "Model " + this.name + " was not found"
-  else
-    return this.name + " was not found"
-}
+var Fetcher = exports.Fetcher = {}
 
 /**
  * Generate an absolute filename from the type and the name of a file to be loaded
@@ -52,7 +38,7 @@ var fetch = function(name, type) {
     var e = require(fname)
     return e[varName(name, type)]
   } catch (error) {
-    throw new FetchError(name, type)
+    throw new Errors.NotFoundError(type + " " + name + "was not found", {inner: error});
   }
 }
 
