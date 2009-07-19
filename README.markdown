@@ -13,9 +13,10 @@ just a proof-of-concept implementation supporting my diploma thesis.
 Requirements
 ------------------------------------------------------------------------------
 
-*Kupo* should run on all Unix systems. It was tested with MacOS X 10.5.6. To
-use *Kupo* you need to have a running MongoDB Server on your machine.
-(<http://www.mongodb.org>). You also should have [git][git] installed.
+*Kupo* should run on all Unix systems. It was tested with MacOS X 10.5.7 and
+Debian 5.0. To use *Kupo* you need to have a running MongoDB Server >= 0.9.6
+on your machine. (<http://www.mongodb.org>). You also should have [git][git]
+installed.
 
 [git]: http://www.git-scm.com/
 
