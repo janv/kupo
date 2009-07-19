@@ -30,7 +30,11 @@ ResourceController.requestInstance = function(_model){
  *
  * To allow callbacks to modify request and result, both are communicated
  * through member variables of the current ResourceController instance
- * request, result
+ * request, result.
+ *
+ * If the beforeProcess filter assigns a value to this.result, the
+ * request method is not called. Instead, the result is returned to the 
+ * client immediately.
  */
 ResourceController.process = function() {
    this.buildRequest();
