@@ -143,6 +143,7 @@ var HasManyProxy = function(instance, targetModel, assocName, options) {
       };
     }
     this.callbacks = [];
+    //TODO Wouldn't the newInstances and the cache have to be cleared aswell?
   }
 }
 
