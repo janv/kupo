@@ -1,4 +1,6 @@
+/** A number of predefined validaton generators */
 var Validations = exports.Validations = {
+  /** Verifies that the named property is a Number */
   validatesNumericalityOf : function(prop) {
     return function(){
       if (this.get(prop) && (('number' == typeof this.get(prop)) || (this.get(prop) instanceof Number))) {
@@ -10,6 +12,7 @@ var Validations = exports.Validations = {
     }
   },
 
+  /** Verifies that the named property matches a regular expression */
   validatesFormatOf : function(prop, regex) {
     return function(){
       if (this.get(prop) && this.get(prop).match && this.get(prop).match(regex)) {
@@ -21,6 +24,7 @@ var Validations = exports.Validations = {
     }
   },
   
+  /** Verifies that the named property exists */
   validatesPresenceOf : function(prop) {
     return function(){
       if (this.get(prop) === undefined) {
@@ -32,6 +36,7 @@ var Validations = exports.Validations = {
     }
   },
   
+  /** Verifies that the named property exists and is a non-empty String */
   validatesNonBlank : function(prop) {
     return function(){
       if (this.get(prop) && this.get(prop).match && this.get(prop).match(/[^\s+]/)) {
@@ -43,6 +48,7 @@ var Validations = exports.Validations = {
     }
   },
   
+  /** Verifies that the named property has the format of an ID */
   validatesId : function(prop) {
     return function(){
       if (this.get(prop) && this.get(prop).match && this.get(prop).match(/^[0-9a-f]{24}$/i)) {

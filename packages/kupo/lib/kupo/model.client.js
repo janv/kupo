@@ -5,6 +5,10 @@ require('object');
 
 var ClassPrototype = exports.ClassPrototype = Object.create(generic.ClassPrototype);
 
+/**
+ * Takes an object (or an array of objects) and uses it as a data property in
+ * a new Instance of this model.
+ */
 ClassPrototype.wrap = function(objects) {
   klass = this;
   function wrapSingle(o) {

@@ -64,6 +64,10 @@ var deliverLoader = require('sandbox').Loader({
   extensions : ["", ".client.js", ".js"]
 });
 
+/**
+ * Helper function that returns a JavaScript module to the client.
+ * @private
+ */
 var deliverJavascript = function(request) {
   var id = request.pathInfo().match(/^\/js\/*(.*)/)[1];
   id = deliverLoader.resolve(id, '');

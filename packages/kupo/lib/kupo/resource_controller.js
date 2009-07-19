@@ -25,6 +25,13 @@ ResourceController.requestInstance = function(_model){
    return r;
 }
 
+/**
+ * Process the request
+ *
+ * To allow callbacks to modify request and result, both are communicated
+ * through member variables of the current ResourceController instance
+ * request, result
+ */
 ResourceController.process = function() {
    this.buildRequest();
    
@@ -43,20 +50,16 @@ ResourceController.process = function() {
  *
  * Methods
  * 
- * GET   /model         -> Simple: Collection
- *                                                     call index
- * GET   /model/<int>   -> Simple: Single resource
- *                                                     call show
- * GET   /model/*       -> GET JRPC on Model
- *                                                     build JRPC from request (last segment + querystring)
- * GET   /model/<int>/* -> GET JRPC auf Instanz
- *                                                     load instance
- *                                                     build JRPC from request (last segment + querystring)
- * POST /model          -> JRPC auf Klasse
- *                                                     build JRPC from body
- * POST /model/<int>    -> JRPC auf Instanz
- *                                                     load instance
- *                                                     build JRPC from body
+ * GET   /model/*       -> GET JRPC on Class
+ *                                                build JRPC from request (last segment + querystring)
+ * GET   /model/<int>/* -> GET JRPC on Instance
+ *                                                load instance
+ *                                                build JRPC from request (last segment + querystring)
+ * POST /model          -> JRPC on Class
+ *                                                build JRPC from body
+ * POST /model/<int>    -> JRPC on Instance
+ *                                                load instance
+ *                                                build JRPC from body
  * 
  * @private
  */
@@ -91,6 +94,12 @@ ResourceController.buildRequest = function() {
    }
 }
 
+/**
+ * Executes the request.
+ * Called in Controller.handle, do not call by yourself
+ *
+ * @private
+ */
 ResourceController.executeRequest = function() {
    var methodName = this.jrpcRequest.getMethodName()
    if (this.target[methodName] != null && typeof this.target[methodName] == 'function') {

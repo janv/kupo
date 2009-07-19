@@ -19,6 +19,7 @@ var Error = {
     return JRPCRequest.buildError(this, this.code, this.headers)
   },
   
+  /** A stacktrace for this exception */
   "backtrace" : function(){
     return (this.inner && String( (this.inner.rhinoException && this.inner.rhinoException.printStackTrace()) || (this.inner.name + ": " + this.inner.message) )) || "";
   },

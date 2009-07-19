@@ -16,6 +16,8 @@ var Controller = exports.Controller = {
   //Cookies
   /** Extract the Cookies from the request and store them in the Controller instance */
   cookiesLoad : function() {
+     // crappy because they are prefixed by unnecessary whitespace
+     // This gets fixed below
     var crappyCookies = this.request.cookies();
     this.cookies = {}
     for (var key in crappyCookies) {
@@ -54,7 +56,7 @@ var Controller = exports.Controller = {
       this.cookiesLoad();
       this.sessionSetup();
       
-      this.response = this.process();
+      this.response = this.process(); // actually process the request
       
       this.sessionTeardown();
       this.cookiesStore();

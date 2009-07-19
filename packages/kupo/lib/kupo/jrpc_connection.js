@@ -1,12 +1,20 @@
 var JSON = require('json');
 
+/**
+ * A clientside JSON-RPC connection that can be used to send messages to a server
+ * 
+ * @param url               URL of the service
+ * @param connectionOptions An object. Currently no options are supported
+ */
 var JRPCConnection = exports.JRPCConnection = function(url, connectionOptions) {
   connectionOptions = connectionOptions || {};
   
+  /** Create a new JRPCConnection for a model instance, identified by an ID */
   this.onId = function(id) {
     return new JRPCConnection(url + '/' + id, connectionOptions);
   }
   
+  /** Call a method remotely with named parameters */
   this.callNamed = function(procedure, parameters) {
     if (typeof parameters == 'object') {
       return this.callInternal(procedure, parameters);
@@ -15,6 +23,7 @@ var JRPCConnection = exports.JRPCConnection = function(url, connectionOptions) {
     }
   }
   
+  /** Call a method remotely with ordered parameters */
   this.call = function(procedure, parameters) {
     if (parameters instanceof Array) {
       return this.callInternal(procedure, parameters);
@@ -27,6 +36,13 @@ var JRPCConnection = exports.JRPCConnection = function(url, connectionOptions) {
     }
   }
   
+  /**
+   * After the parameters have been converted in call or callNamed,
+   * callInternal is used to actually perform the call.
+   * 
+   * Requires jQuery and Firebug
+   * @private
+   */
   this.callInternal  = function(procedure, parameters){
     console.group("Making Ajax Call to %s, calling '%s' with %o", url, procedure, parameters);
     var response = null;

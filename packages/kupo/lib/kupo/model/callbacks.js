@@ -1,5 +1,6 @@
 var Errors = require('kupo/errors').Errors
 
+/** A number of predefined callbacks or callback generators */
 var Callbacks = exports.Callbacks = {
   
   /**
