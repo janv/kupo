@@ -266,7 +266,7 @@ never be called manually, it is only used internally by
 
 #### Associations
 
-Associations provide automated contruction and use of relationships between
+Associations provide automated construction and use of relationships between
 models. To declare an association, create a property with the name of the
 association in the `associations` object inside the `specialization` object
 (examples are available in the test suite in
